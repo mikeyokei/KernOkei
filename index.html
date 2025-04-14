@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerning Pair Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#65C3BA',
+                    }
+                }
+            },
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* Base kerning and stylistic set classes */
+        .kern-display {
+            font-feature-settings: "kern" 1;
+        }
+        .no-kern {
+            font-feature-settings: "kern" 0;
+        }
+        
+        /* Stylistic set classes, to be combined with kerning */
+        .ss01 { font-feature-settings: "ss01" 1; }
+        .ss02 { font-feature-settings: "ss02" 1; }
+        .ss03 { font-feature-settings: "ss03" 1; }
+        .ss04 { font-feature-settings: "ss04" 1; }
+        .ss05 { font-feature-settings: "ss05" 1; }
+        .ss06 { font-feature-settings: "ss06" 1; }
+        .ss07 { font-feature-settings: "ss07" 1; }
+        .ss08 { font-feature-settings: "ss08" 1; }
+        .ss09 { font-feature-settings: "ss09" 1; }
+        .ss10 { font-feature-settings: "ss10" 1; }
+        .ss11 { font-feature-settings: "ss11" 1; }
+        .ss12 { font-feature-settings: "ss12" 1; }
+        .ss13 { font-feature-settings: "ss13" 1; }
+        .ss14 { font-feature-settings: "ss14" 1; }
+        .ss15 { font-feature-settings: "ss15" 1; }
+        .ss16 { font-feature-settings: "ss16" 1; }
+        .ss17 { font-feature-settings: "ss17" 1; }
+        .ss18 { font-feature-settings: "ss18" 1; }
+        .ss19 { font-feature-settings: "ss19" 1; }
+        .ss20 { font-feature-settings: "ss20" 1; }
+        
+        /* Combinations of kerning and stylistic sets will be applied via JS */
+        
+        .pair-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .pair-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Dark mode styles */
+        .dark .pair-card {
+            background-color: #2d2d2d;
+            color: #f3f4f6;
+        }
+        .dark .pair-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <h1 class="text-xl font-bold tracking-tight mb-8 text-primary flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L8 6H11V18H8L12 22L16 18H13V6H16L12 2Z" fill="currentColor"/>
+            </svg>
+            Kerning Pair Checker
+        </h1>
+        
+        <div class="bg-white dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <label for="selectedLetter" class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Select Letter</label>
+                    <div class="flex space-x-2 items-center">
+                        <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-12 text-center text-2xl border border-gray-200 dark:border-gray-800 rounded-sm focus:ring-primary focus:border-primary bg-white dark:bg-gray-900" />
+                        <button id="checkButton" class="h-12 bg-primary hover:bg-primary/90 text-white rounded-sm px-4 text-sm transition-colors">
+                            Generate
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Character Sets</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="toggleLatinBtn" class="px-3 py-1 bg-primary text-white rounded-sm text-xs font-medium" disabled>Latin</button>
+                        <button id="toggleLatinDiacriticsBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm text-xs font-medium">Latin Diacritics</button>
+                        <button id="toggleVietnameseBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm text-xs font-medium">Vietnamese</button>
+                        <button id="toggleNumbersBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm text-xs font-medium">Numbers</button>
+                        <button id="togglePunctuationBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm text-xs font-medium">Punctuation</button>
+                        <button id="toggleSymbolsBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm text-xs font-medium">Symbols</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="fontUpload" class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Upload Font</label>
+                    <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-sm border border-gray-200 dark:border-gray-800 rounded-sm px-3 py-2 bg-white dark:bg-gray-900 focus:ring-primary focus:border-primary" />
+                </div>
+            </div>
+            
+            <div class="mt-8 flex gap-4 items-center flex-wrap">
+                <div class="flex items-center">
+                    <input type="checkbox" id="toggleKerning" class="mr-2 h-4 w-4 text-primary focus:ring-primary rounded-sm" checked />
+                    <label for="toggleKerning" class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Enable Kerning</label>
+                </div>
+                
+                <div class="flex items-center">
+                    <label for="fontSizeSelect" class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mr-2">Size</label>
+                    <select id="fontSizeSelect" class="text-sm border border-gray-200 dark:border-gray-800 rounded-sm px-2 py-1 bg-white dark:bg-gray-900 focus:ring-primary focus:border-primary">
+                        <option value="text-xl">Small</option>
+                        <option value="text-2xl" selected>Medium</option>
+                        <option value="text-3xl">Large</option>
+                        <option value="text-4xl">XL</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">OpenType Features</label>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="stylisticSetSelect" class="text-sm border border-gray-200 dark:border-gray-800 rounded-sm px-2 py-1 bg-white dark:bg-gray-900 focus:ring-primary focus:border-primary">
+                            <option value="none">No Stylistic Set</option>
+                            <option value="ss01">Stylistic Set 1</option>
+                            <option value="ss02">Stylistic Set 2</option>
+                            <option value="ss03">Stylistic Set 3</option>
+                            <option value="ss04">Stylistic Set 4</option>
+                            <option value="ss05">Stylistic Set 5</option>
+                            <option value="ss06">Stylistic Set 6</option>
+                            <option value="ss07">Stylistic Set 7</option>
+                            <option value="ss08">Stylistic Set 8</option>
+                            <option value="ss09">Stylistic Set 9</option>
+                            <option value="ss10">Stylistic Set 10</option>
+                            <option value="ss11">Stylistic Set 11</option>
+                            <option value="ss12">Stylistic Set 12</option>
+                            <option value="ss13">Stylistic Set 13</option>
+                            <option value="ss14">Stylistic Set 14</option>
+                            <option value="ss15">Stylistic Set 15</option>
+                            <option value="ss16">Stylistic Set 16</option>
+                            <option value="ss17">Stylistic Set 17</option>
+                            <option value="ss18">Stylistic Set 18</option>
+                            <option value="ss19">Stylistic Set 19</option>
+                            <option value="ss20">Stylistic Set 20</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Results</h2>
+                <div class="flex space-x-2">
+                    <button id="copyAllButton" class="bg-primary hover:bg-primary/90 text-white rounded-sm px-3 py-1 text-xs font-medium transition-colors">
+                        Copy All
+                    </button>
+                    <button id="regenerateButton" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-sm px-3 py-1 text-xs font-medium transition-colors hidden">
+                        Regenerate
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Pairs Section -->
+            <div class="mb-8">
+                <div class="border-b border-gray-200 dark:border-gray-800 mb-4 pb-1">
+                    <h3 class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Letter Pairs</h3>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-sm mb-4">
+                    <div class="border-b border-gray-200 dark:border-gray-800 flex justify-between items-center px-3 py-2">
+                        <span class="text-xs uppercase tracking-wider">First position</span>
+                        <button class="copy-btn text-primary hover:text-primary/80 text-xs" data-target="firstPosResults">Copy</button>
+                    </div>
+                    <div id="firstPosResults" class="p-4 font-kerning-custom text-2xl break-words"></div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-sm">
+                    <div class="border-b border-gray-200 dark:border-gray-800 flex justify-between items-center px-3 py-2">
+                        <span class="text-xs uppercase tracking-wider">Second position</span>
+                        <button class="copy-btn text-primary hover:text-primary/80 text-xs" data-target="secondPosResults">Copy</button>
+                    </div>
+                    <div id="secondPosResults" class="p-4 font-kerning-custom text-2xl break-words"></div>
+                </div>
+            </div>
+            
+            <!-- Triplets Section -->
+            <div>
+                <div class="border-b border-gray-200 dark:border-gray-800 mb-4 pb-1">
+                    <h3 class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Letter Triplets</h3>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-sm mb-4">
+                    <div class="border-b border-gray-200 dark:border-gray-800 flex justify-between items-center px-3 py-2">
+                        <span class="text-xs uppercase tracking-wider">First position</span>
+                        <button class="copy-btn text-primary hover:text-primary/80 text-xs" data-target="tripletFirstResults">Copy</button>
+                    </div>
+                    <div id="tripletFirstResults" class="p-4 font-kerning-custom text-2xl break-words"></div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-sm mb-4">
+                    <div class="border-b border-gray-200 dark:border-gray-800 flex justify-between items-center px-3 py-2">
+                        <span class="text-xs uppercase tracking-wider">Middle position</span>
+                        <button class="copy-btn text-primary hover:text-primary/80 text-xs" data-target="tripletMiddleResults">Copy</button>
+                    </div>
+                    <div id="tripletMiddleResults" class="p-4 font-kerning-custom text-2xl break-words"></div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-sm">
+                    <div class="border-b border-gray-200 dark:border-gray-800 flex justify-between items-center px-3 py-2">
+                        <span class="text-xs uppercase tracking-wider">Last position</span>
+                        <button class="copy-btn text-primary hover:text-primary/80 text-xs" data-target="tripletLastResults">Copy</button>
+                    </div>
+                    <div id="tripletLastResults" class="p-4 font-kerning-custom text-2xl break-words"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Force light mode regardless of system preference
+        document.documentElement.classList.remove('dark');
+
+        // Character sets
+        const latinAlphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const latinDiacritics = 'àáâäæãåāèéêëēėęîïíīįìôöòóœøōõûüùúūÿÀÁÂÄÆÃÅĀÈÉÊËĒĖĘÎÏÍĪĮÌÔÖÒÓŒØŌÕÛÜÙÚŪŸçÇñÑßðÐþÞ';
+        const vietnameseChars = 'ăâđêôơưĂÂĐÊÔƠƯáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ';
+        const numbers = '0123456789';
+        const punctuation = '.,;:!?\'"\\/()[]{}<>@#$%^&*_-+=|~`';
+        const symbols = '€£¥₹₽¢¤§©®™°′″‰¶†‡•…‱⁂⁋⁎⁑⁠⁰⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎';
+
+        // DOM Elements
+        const selectedLetterInput = document.getElementById('selectedLetter');
+        const checkButton = document.getElementById('checkButton');
+        const resultsBox = document.getElementById('resultsBox');
+        const copyButton = document.getElementById('copyButton');
+        const toggleVietnameseBtn = document.getElementById('toggleVietnameseBtn');
+        const toggleNumbersBtn = document.getElementById('toggleNumbersBtn');
+        const togglePunctuationBtn = document.getElementById('togglePunctuationBtn');
+        const toggleLatinBtn = document.getElementById('toggleLatinBtn');
+        const fontUpload = document.getElementById('fontUpload');
+        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        const toggleKerning = document.getElementById('toggleKerning');
+
+        // State
+        let includeVietnamese = false;
+        let includeNumbers = false;
+        let includePunctuation = false;
+        let includeLatinDiacritics = false;
+        let includeSymbols = false;
+        let includeLatin = true; // Always true
+
+        // Toggle button style helper
+        function updateButtonStyle(button, isActive) {
+            if (isActive) {
+                button.classList.remove('bg-gray-200', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+                button.classList.add('bg-primary', 'text-white');
+            } else {
+                button.classList.remove('bg-primary', 'text-white');
+                button.classList.add('bg-gray-200', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+            }
+        }
+
+        // Toggle button event listeners
+        toggleVietnameseBtn.addEventListener('click', () => {
+            includeVietnamese = !includeVietnamese;
+            updateButtonStyle(toggleVietnameseBtn, includeVietnamese);
+            generatePairs();
+        });
+
+        toggleNumbersBtn.addEventListener('click', () => {
+            includeNumbers = !includeNumbers;
+            updateButtonStyle(toggleNumbersBtn, includeNumbers);
+            generatePairs();
+        });
+
+        togglePunctuationBtn.addEventListener('click', () => {
+            includePunctuation = !includePunctuation;
+            updateButtonStyle(togglePunctuationBtn, includePunctuation);
+            generatePairs();
+        });
+        
+        // Get references to the new toggle buttons
+        const toggleLatinDiacriticsBtn = document.getElementById('toggleLatinDiacriticsBtn');
+        const toggleSymbolsBtn = document.getElementById('toggleSymbolsBtn');
+        
+        // Add event listeners for the new toggle buttons
+        toggleLatinDiacriticsBtn.addEventListener('click', () => {
+            includeLatinDiacritics = !includeLatinDiacritics;
+            updateButtonStyle(toggleLatinDiacriticsBtn, includeLatinDiacritics);
+            generatePairs();
+        });
+        
+        toggleSymbolsBtn.addEventListener('click', () => {
+            includeSymbols = !includeSymbols;
+            updateButtonStyle(toggleSymbolsBtn, includeSymbols);
+            generatePairs();
+        });
+
+        // Font size, kerning, and stylistic set change listeners
+        fontSizeSelect.addEventListener('change', updateStyles);
+        toggleKerning.addEventListener('change', updateStyles);
+        
+        // Get stylistic set select element
+        const stylisticSetSelect = document.getElementById('stylisticSetSelect');
+        stylisticSetSelect.addEventListener('change', updateStyles);
+
+        // Generate pairs and triplets when the button is clicked
+        checkButton.addEventListener('click', generatePairs);
+
+        // Allow generating pairs by pressing Enter in the input field
+        selectedLetterInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                generatePairs();
+            }
+        });
+
+        // Set initial focus
+        selectedLetterInput.focus();
+
+        // Main function to generate pairs and triplets
+        function generatePairs() {
+            const selectedLetter = selectedLetterInput.value;
+            
+            if (!selectedLetter) {
+                alert('Please enter a letter first');
+                return;
+            }
+
+            // Get the active character set
+            let charSet = latinAlphabet;
+            if (includeLatinDiacritics) charSet += latinDiacritics;
+            if (includeVietnamese) charSet += vietnameseChars;
+            if (includeNumbers) charSet += numbers;
+            if (includePunctuation) charSet += punctuation;
+            if (includeSymbols) charSet += symbols;
+
+            // Show regenerate button if it's hidden
+            document.getElementById('regenerateButton').classList.remove('hidden');
+            
+            // First position pairs
+            const firstPosResults = document.getElementById('firstPosResults');
+            firstPosResults.innerHTML = '';
+            for (const char of charSet) {
+                const span = document.createElement('span');
+                span.textContent = selectedLetter + char + ' ';
+                firstPosResults.appendChild(span);
+            }
+            
+            // Second position pairs
+            const secondPosResults = document.getElementById('secondPosResults');
+            secondPosResults.innerHTML = '';
+            for (const char of charSet) {
+                const span = document.createElement('span');
+                span.textContent = char + selectedLetter + ' ';
+                secondPosResults.appendChild(span);
+            }
+            
+            // First position triplets
+            const tripletFirstResults = document.getElementById('tripletFirstResults');
+            tripletFirstResults.innerHTML = '';
+            for (let i = 0; i < charSet.length; i++) {
+                for (let j = 0; j < charSet.length; j++) {
+                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
+                        const span = document.createElement('span');
+                        span.textContent = selectedLetter + charSet[i] + charSet[j] + ' ';
+                        tripletFirstResults.appendChild(span);
+                    }
+                }
+            }
+            
+            // Middle position triplets
+            const tripletMiddleResults = document.getElementById('tripletMiddleResults');
+            tripletMiddleResults.innerHTML = '';
+            for (let i = 0; i < charSet.length; i++) {
+                for (let j = 0; j < charSet.length; j++) {
+                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
+                        const span = document.createElement('span');
+                        span.textContent = charSet[i] + selectedLetter + charSet[j] + ' ';
+                        tripletMiddleResults.appendChild(span);
+                    }
+                }
+            }
+            
+            // Last position triplets
+            const tripletLastResults = document.getElementById('tripletLastResults');
+            tripletLastResults.innerHTML = '';
+            for (let i = 0; i < charSet.length; i++) {
+                for (let j = 0; j < charSet.length; j++) {
+                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
+                        const span = document.createElement('span');
+                        span.textContent = charSet[i] + charSet[j] + selectedLetter + ' ';
+                        tripletLastResults.appendChild(span);
+                    }
+                }
+            }
+            
+            // Apply font and kerning styles
+            updateStyles();
+        }
+
+        // Custom font handling
+        let customFontName = null;
+        fontUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fontData = e.target.result;
+                    customFontName = 'CustomFont' + Date.now();
+                    
+                    // Create a style element and add the @font-face rule
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @font-face {
+                            font-family: '${customFontName}';
+                            src: url('${fontData}') format('${getFormat(file.name)}');
+                            font-weight: normal;
+                            font-style: normal;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Apply the font
+                    updateStyles();
+                    
+                                // Regenerate pairs if any results already exist
+                    const firstPosResults = document.getElementById('firstPosResults');
+                    if (firstPosResults && firstPosResults.innerHTML) {
+                        generatePairs();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function getFormat(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'ttf': return 'truetype';
+                case 'otf': return 'opentype';
+                case 'woff': return 'woff';
+                case 'woff2': return 'woff2';
+                default: return 'truetype';
+            }
+        }
+
+        // Copy button functionality for individual sections
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
+                
+                // Create a temporary textarea to hold the text
+                const textarea = document.createElement('textarea');
+                textarea.value = targetElement.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                // Visual feedback
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Copy all button functionality
+        document.getElementById('copyAllButton').addEventListener('click', () => {
+            // Collect all text content
+            const allSections = [
+                document.getElementById('firstPosResults'),
+                document.getElementById('secondPosResults'),
+                document.getElementById('tripletFirstResults'),
+                document.getElementById('tripletMiddleResults'),
+                document.getElementById('tripletLastResults')
+            ];
+            
+            // Create headings and content
+            const sections = [
+                "--- LETTER PAIRS (First Position) ---\n",
+                allSections[0].textContent,
+                "\n\n--- LETTER PAIRS (Second Position) ---\n",
+                allSections[1].textContent,
+                "\n\n--- LETTER TRIPLETS (First Position) ---\n",
+                allSections[2].textContent,
+                "\n\n--- LETTER TRIPLETS (Middle Position) ---\n",
+                allSections[3].textContent,
+                "\n\n--- LETTER TRIPLETS (Last Position) ---\n",
+                allSections[4].textContent
+            ];
+            
+            // Create a temporary textarea to hold the text
+            const textarea = document.createElement('textarea');
+            textarea.value = sections.join('');
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            // Visual feedback
+            const copyAllButton = document.getElementById('copyAllButton');
+            const originalText = copyAllButton.textContent;
+            copyAllButton.textContent = 'All Copied!';
+            setTimeout(() => {
+                copyAllButton.textContent = originalText;
+            }, 2000);
+        });
+
+        // Add regenerate button functionality
+        document.getElementById('regenerateButton').addEventListener('click', generatePairs);
+
+        // Update font styles, kerning, and stylistic sets
+        function updateStyles() {
+            const isKerningEnabled = toggleKerning.checked;
+            const fontSize = fontSizeSelect.value;
+            const selectedStylisticSet = stylisticSetSelect.value;
+            
+            // Get all result containers
+            const resultContainers = [
+                document.getElementById('firstPosResults'),
+                document.getElementById('secondPosResults'),
+                document.getElementById('tripletFirstResults'),
+                document.getElementById('tripletMiddleResults'),
+                document.getElementById('tripletLastResults')
+            ];
+            
+            // Apply styles to all result containers
+            resultContainers.forEach(container => {
+                // Apply font size
+                container.classList.remove('text-xl', 'text-2xl', 'text-3xl', 'text-4xl');
+                container.classList.add(fontSize);
+                
+                // Apply custom font if uploaded
+                if (customFontName) {
+                    container.style.fontFamily = `'${customFontName}', sans-serif`;
+                }
+                
+                // First, remove all stylistic set classes
+                for (let i = 1; i <= 20; i++) {
+                    const ssClass = `ss${i.toString().padStart(2, '0')}`;
+                    container.classList.remove(ssClass);
+                }
+                
+                // Clear any existing font-feature-settings
+                container.style.fontFeatureSettings = '';
+                
+                // Apply kerning and stylistic sets using inline style for proper combination
+                if (selectedStylisticSet !== 'none' && isKerningEnabled) {
+                    // Both kerning and stylistic set
+                    container.style.fontFeatureSettings = `"kern" 1, "${selectedStylisticSet}" 1`;
+                    container.classList.remove('kern-display', 'no-kern');
+                } else if (selectedStylisticSet !== 'none') {
+                    // Only stylistic set, no kerning
+                    container.style.fontFeatureSettings = `"kern" 0, "${selectedStylisticSet}" 1`;
+                    container.classList.remove('kern-display', 'no-kern');
+                } else if (isKerningEnabled) {
+                    // Only kerning, no stylistic set
+                    container.classList.add('kern-display');
+                    container.classList.remove('no-kern');
+                    container.style.fontFeatureSettings = '';
+                } else {
+                    // Neither kerning nor stylistic set
+                    container.classList.add('no-kern');
+                    container.classList.remove('kern-display');
+                    container.style.fontFeatureSettings = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+
