@@ -10,17 +10,19 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#65C3BA',
-                        secondary: '#F4A261',
-                        dark: '#264653',
-                        light: '#F8F9FA'
+                        primary: '#000000',
+                        secondary: '#333333',
+                        accent: '#00FF00',
+                        light: '#FFFFFF',
+                        gray: '#EEEEEE'
                     },
                     fontFamily: {
+                        sans: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        mono: ['Menlo', 'Monaco', 'Consolas', 'monospace'],
                         cheltender: ['Cheltender-Regular', 'sans-serif']
                     }
                 }
-            },
-            darkMode: 'class',
+            }
         }
     </script>
     <style>
@@ -34,11 +36,6 @@
             font-display: swap;
         }
         
-        /* Set Cheltender as default font */
-        body {
-            font-family: 'Cheltender-Regular', sans-serif;
-        }
-        
         /* Base kerning and stylistic set classes */
         .kern-display {
             font-feature-settings: "kern" 1;
@@ -47,7 +44,7 @@
             font-feature-settings: "kern" 0;
         }
         
-        /* Stylistic set classes, to be combined with kerning */
+        /* Stylistic set classes */
         .ss01 { font-feature-settings: "ss01" 1; }
         .ss02 { font-feature-settings: "ss02" 1; }
         .ss03 { font-feature-settings: "ss03" 1; }
@@ -69,141 +66,145 @@
         .ss19 { font-feature-settings: "ss19" 1; }
         .ss20 { font-feature-settings: "ss20" 1; }
         
-        /* Combinations of kerning and stylistic sets will be applied via JS */
-        
-        .pair-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .pair-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        /* Improved button and input styles */
-        .btn-primary {
-            @apply bg-primary hover:bg-primary/90 text-white rounded px-4 py-2 transition-colors;
-        }
-        .btn-secondary {
-            @apply bg-secondary hover:bg-secondary/90 text-white rounded px-4 py-2 transition-colors;
-        }
-        .btn-outline {
-            @apply border border-primary text-primary hover:bg-primary/10 rounded px-4 py-2 transition-colors;
-        }
-        .toggle-btn {
-            @apply px-3 py-1 rounded text-xs font-medium transition-colors;
-        }
-        .toggle-btn-active {
-            @apply bg-primary text-white;
-        }
-        .toggle-btn-inactive {
-            @apply bg-gray-200 text-gray-700;
-        }
-        
         /* Custom scrollbar */
         .results-container {
             max-height: 250px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #65C3BA #e5e7eb;
+            scrollbar-color: #000000 #eeeeee;
         }
         .results-container::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         .results-container::-webkit-scrollbar-track {
-            background: #e5e7eb;
-            border-radius: 10px;
+            background: #eeeeee;
         }
         .results-container::-webkit-scrollbar-thumb {
-            background-color: #65C3BA;
-            border-radius: 10px;
+            background-color: #000000;
+        }
+        
+        /* Brutalist UI styles */
+        input, select, button {
+            border-radius: 0 !important;
+        }
+        
+        .btn-primary {
+            @apply bg-black text-white uppercase text-xs tracking-wider px-4 py-2 border border-black hover:bg-gray-900 transition-colors;
+        }
+        
+        .btn-secondary {
+            @apply bg-white text-black uppercase text-xs tracking-wider px-4 py-2 border border-black hover:bg-gray-100 transition-colors;
+        }
+        
+        .btn-outline {
+            @apply bg-white text-black uppercase text-xs tracking-wider px-4 py-2 border border-black hover:bg-gray-100 transition-colors;
+        }
+        
+        .toggle-btn {
+            @apply px-3 py-1 text-xs uppercase tracking-wider transition-colors border border-black;
+        }
+        
+        .toggle-btn-active {
+            @apply bg-black text-white;
+        }
+        
+        .toggle-btn-inactive {
+            @apply bg-white text-black;
+        }
+        
+        .section-title {
+            @apply text-xs uppercase tracking-wider font-medium border-b border-black pb-1 mb-4;
+        }
+        
+        .results-box {
+            @apply border border-black;
+        }
+        
+        .results-header {
+            @apply border-b border-black flex justify-between items-center px-4 py-3 bg-gray-100;
         }
     </style>
 </head>
-<body class="bg-light text-dark min-h-screen">
-    <header class="bg-dark text-light py-4 shadow-md">
+<body class="bg-white text-black min-h-screen font-sans">
+    <header class="bg-black text-white py-4 border-b border-black">
         <div class="container mx-auto px-4 max-w-6xl flex items-center justify-between">
-            <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L8 6H11V18H8L12 22L16 18H13V6H16L12 2Z" fill="currentColor"/>
-                </svg>
-                Kerning Pair Checker
-            </h1>
-            <p class="text-sm opacity-80">Font: Cheltender-Regular</p>
+            <h1 class="text-xl font-bold uppercase tracking-wider">KERNING PAIR CHECKER</h1>
+            <p class="text-sm tracking-wider uppercase">FONT: <span id="currentFontName">CHELTENDER-REGULAR</span></p>
         </div>
     </header>
     
     <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="border border-black p-6 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="flex flex-col">
-                    <label for="selectedLetter" class="block text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Select Letter</label>
-                    <div class="flex space-x-2 items-center">
-                        <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-12 text-center text-2xl border border-gray-300 rounded focus:ring-primary focus:border-primary bg-white" />
+                    <label for="selectedLetter" class="block text-xs uppercase tracking-wider mb-2 font-bold">Select Letter</label>
+                    <div class="flex space-x-0 items-center">
+                        <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-12 text-center text-2xl border border-black bg-white" />
                         <button id="checkButton" class="btn-primary h-12">
-                            Generate
+                            GENERATE
                         </button>
                     </div>
                 </div>
                 
                 <div class="flex flex-col">
-                    <label class="block text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Character Sets</label>
-                    <div class="flex flex-wrap gap-2">
-                        <button id="toggleLatinBtn" class="toggle-btn toggle-btn-active" disabled>Latin</button>
-                        <button id="toggleLatinDiacriticsBtn" class="toggle-btn toggle-btn-inactive">Latin Diacritics</button>
-                        <button id="toggleVietnameseBtn" class="toggle-btn toggle-btn-inactive">Vietnamese</button>
-                        <button id="toggleNumbersBtn" class="toggle-btn toggle-btn-inactive">Numbers</button>
-                        <button id="togglePunctuationBtn" class="toggle-btn toggle-btn-inactive">Punctuation</button>
-                        <button id="toggleSymbolsBtn" class="toggle-btn toggle-btn-inactive">Symbols</button>
+                    <label class="block text-xs uppercase tracking-wider mb-2 font-bold">Character Sets</label>
+                    <div class="flex flex-wrap gap-0">
+                        <button id="toggleLatinBtn" class="toggle-btn toggle-btn-active" disabled>LATIN</button>
+                        <button id="toggleLatinDiacriticsBtn" class="toggle-btn toggle-btn-inactive">DIACRITICS</button>
+                        <button id="toggleVietnameseBtn" class="toggle-btn toggle-btn-inactive">VIETNAMESE</button>
+                        <button id="toggleNumbersBtn" class="toggle-btn toggle-btn-inactive">NUMBERS</button>
+                        <button id="togglePunctuationBtn" class="toggle-btn toggle-btn-inactive">PUNCTUATION</button>
+                        <button id="toggleSymbolsBtn" class="toggle-btn toggle-btn-inactive">SYMBOLS</button>
                     </div>
                 </div>
                 
                 <div class="flex flex-col">
-                    <label for="fontUpload" class="block text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Upload Font (Optional)</label>
-                    <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-sm border border-gray-300 rounded px-3 py-2 bg-white focus:ring-primary focus:border-primary" />
-                    <p class="text-xs text-gray-500 mt-2">Default: Cheltender-Regular</p>
+                    <label for="fontUpload" class="block text-xs uppercase tracking-wider mb-2 font-bold">Upload Font</label>
+                    <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-sm border border-black px-3 py-2 bg-white" />
+                    <p class="text-xs uppercase mt-2">DEFAULT: CHELTENDER-REGULAR</p>
                 </div>
             </div>
             
             <div class="mt-8 flex gap-6 items-center flex-wrap">
                 <div class="flex items-center">
-                    <input type="checkbox" id="toggleKerning" class="mr-2 h-4 w-4 text-primary focus:ring-primary rounded" checked />
-                    <label for="toggleKerning" class="text-xs uppercase tracking-wider text-gray-500">Enable Kerning</label>
+                    <input type="checkbox" id="toggleKerning" class="mr-2 h-4 w-4 border-black" checked />
+                    <label for="toggleKerning" class="text-xs uppercase tracking-wider font-bold">KERNING</label>
                 </div>
                 
                 <div class="flex items-center">
-                    <label for="fontSizeSelect" class="text-xs uppercase tracking-wider text-gray-500 mr-2">Size</label>
-                    <select id="fontSizeSelect" class="text-sm border border-gray-300 rounded px-2 py-1 bg-white focus:ring-primary focus:border-primary">
-                        <option value="text-xl">Small</option>
-                        <option value="text-2xl" selected>Medium</option>
-                        <option value="text-3xl">Large</option>
+                    <label for="fontSizeSelect" class="text-xs uppercase tracking-wider mr-2 font-bold">SIZE</label>
+                    <select id="fontSizeSelect" class="text-sm border border-black px-2 py-1 bg-white uppercase">
+                        <option value="text-xl">SMALL</option>
+                        <option value="text-2xl" selected>MEDIUM</option>
+                        <option value="text-3xl">LARGE</option>
                         <option value="text-4xl">XL</option>
                     </select>
                 </div>
                 
                 <div>
-                    <label for="stylisticSetSelect" class="text-xs uppercase tracking-wider text-gray-500 mr-2">OpenType Features</label>
-                    <select id="stylisticSetSelect" class="text-sm border border-gray-300 rounded px-2 py-1 bg-white focus:ring-primary focus:border-primary">
-                        <option value="none">No Stylistic Set</option>
-                        <option value="ss01">Stylistic Set 1</option>
-                        <option value="ss02">Stylistic Set 2</option>
-                        <option value="ss03">Stylistic Set 3</option>
-                        <option value="ss04">Stylistic Set 4</option>
-                        <option value="ss05">Stylistic Set 5</option>
-                        <option value="ss06">Stylistic Set 6</option>
-                        <option value="ss07">Stylistic Set 7</option>
-                        <option value="ss08">Stylistic Set 8</option>
-                        <option value="ss09">Stylistic Set 9</option>
-                        <option value="ss10">Stylistic Set 10</option>
-                        <option value="ss11">Stylistic Set 11</option>
-                        <option value="ss12">Stylistic Set 12</option>
-                        <option value="ss13">Stylistic Set 13</option>
-                        <option value="ss14">Stylistic Set 14</option>
-                        <option value="ss15">Stylistic Set 15</option>
-                        <option value="ss16">Stylistic Set 16</option>
-                        <option value="ss17">Stylistic Set 17</option>
-                        <option value="ss18">Stylistic Set 18</option>
-                        <option value="ss19">Stylistic Set 19</option>
-                        <option value="ss20">Stylistic Set 20</option>
+                    <label for="stylisticSetSelect" class="text-xs uppercase tracking-wider mr-2 font-bold">OPENTYPE</label>
+                    <select id="stylisticSetSelect" class="text-sm border border-black px-2 py-1 bg-white">
+                        <option value="none">NO STYLISTIC SET</option>
+                        <option value="ss01">STYLISTIC SET 1</option>
+                        <option value="ss02">STYLISTIC SET 2</option>
+                        <option value="ss03">STYLISTIC SET 3</option>
+                        <option value="ss04">STYLISTIC SET 4</option>
+                        <option value="ss05">STYLISTIC SET 5</option>
+                        <option value="ss06">STYLISTIC SET 6</option>
+                        <option value="ss07">STYLISTIC SET 7</option>
+                        <option value="ss08">STYLISTIC SET 8</option>
+                        <option value="ss09">STYLISTIC SET 9</option>
+                        <option value="ss10">STYLISTIC SET 10</option>
+                        <option value="ss11">STYLISTIC SET 11</option>
+                        <option value="ss12">STYLISTIC SET 12</option>
+                        <option value="ss13">STYLISTIC SET 13</option>
+                        <option value="ss14">STYLISTIC SET 14</option>
+                        <option value="ss15">STYLISTIC SET 15</option>
+                        <option value="ss16">STYLISTIC SET 16</option>
+                        <option value="ss17">STYLISTIC SET 17</option>
+                        <option value="ss18">STYLISTIC SET 18</option>
+                        <option value="ss19">STYLISTIC SET 19</option>
+                        <option value="ss20">STYLISTIC SET 20</option>
                     </select>
                 </div>
             </div>
@@ -211,22 +212,22 @@
 
         <div class="mb-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-sm font-medium text-gray-700">Results</h2>
-                <div class="flex space-x-2">
-                    <button id="copyAllButton" class="btn-secondary text-sm">
+                <h2 class="text-sm uppercase tracking-wider font-bold">RESULTS</h2>
+                <div class="flex space-x-0">
+                    <button id="copyAllButton" class="btn-secondary">
                         <span class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                             </svg>
-                            Copy All
+                            COPY ALL
                         </span>
                     </button>
-                    <button id="regenerateButton" class="btn-outline text-sm hidden">
+                    <button id="regenerateButton" class="btn-outline hidden">
                         <span class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                            Regenerate
+                            REGENERATE
                         </span>
                     </button>
                 </div>
@@ -234,31 +235,31 @@
             
             <!-- Pairs Section -->
             <div class="mb-8">
-                <div class="border-b border-gray-200 mb-4 pb-1">
-                    <h3 class="text-xs uppercase tracking-wider text-gray-500 font-medium">Letter Pairs</h3>
+                <div class="section-title">
+                    <h3>LETTER PAIRS</h3>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 overflow-hidden">
-                    <div class="border-b border-gray-200 flex justify-between items-center px-4 py-3 bg-gray-50">
-                        <span class="text-xs uppercase tracking-wider font-medium">First position</span>
-                        <button class="copy-btn text-primary hover:text-primary/80 text-sm flex items-center" data-target="firstPosResults">
+                <div class="results-box mb-4">
+                    <div class="results-header">
+                        <span class="text-xs uppercase tracking-wider font-bold">FIRST POSITION</span>
+                        <button class="copy-btn text-black hover:text-gray-700 text-sm flex items-center" data-target="firstPosResults">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            Copy
+                            COPY
                         </button>
                     </div>
                     <div id="firstPosResults" class="p-5 font-kerning-custom text-2xl break-words results-container"></div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="border-b border-gray-200 flex justify-between items-center px-4 py-3 bg-gray-50">
-                        <span class="text-xs uppercase tracking-wider font-medium">Second position</span>
-                        <button class="copy-btn text-primary hover:text-primary/80 text-sm flex items-center" data-target="secondPosResults">
+                <div class="results-box">
+                    <div class="results-header">
+                        <span class="text-xs uppercase tracking-wider font-bold">SECOND POSITION</span>
+                        <button class="copy-btn text-black hover:text-gray-700 text-sm flex items-center" data-target="secondPosResults">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            Copy
+                            COPY
                         </button>
                     </div>
                     <div id="secondPosResults" class="p-5 font-kerning-custom text-2xl break-words results-container"></div>
@@ -267,44 +268,44 @@
             
             <!-- Triplets Section -->
             <div>
-                <div class="border-b border-gray-200 mb-4 pb-1">
-                    <h3 class="text-xs uppercase tracking-wider text-gray-500 font-medium">Letter Triplets</h3>
+                <div class="section-title">
+                    <h3>LETTER TRIPLETS</h3>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 overflow-hidden">
-                    <div class="border-b border-gray-200 flex justify-between items-center px-4 py-3 bg-gray-50">
-                        <span class="text-xs uppercase tracking-wider font-medium">First position</span>
-                        <button class="copy-btn text-primary hover:text-primary/80 text-sm flex items-center" data-target="tripletFirstResults">
+                <div class="results-box mb-4">
+                    <div class="results-header">
+                        <span class="text-xs uppercase tracking-wider font-bold">FIRST POSITION</span>
+                        <button class="copy-btn text-black hover:text-gray-700 text-sm flex items-center" data-target="tripletFirstResults">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            Copy
+                            COPY
                         </button>
                     </div>
                     <div id="tripletFirstResults" class="p-5 font-kerning-custom text-2xl break-words results-container"></div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 overflow-hidden">
-                    <div class="border-b border-gray-200 flex justify-between items-center px-4 py-3 bg-gray-50">
-                        <span class="text-xs uppercase tracking-wider font-medium">Middle position</span>
-                        <button class="copy-btn text-primary hover:text-primary/80 text-sm flex items-center" data-target="tripletMiddleResults">
+                <div class="results-box mb-4">
+                    <div class="results-header">
+                        <span class="text-xs uppercase tracking-wider font-bold">MIDDLE POSITION</span>
+                        <button class="copy-btn text-black hover:text-gray-700 text-sm flex items-center" data-target="tripletMiddleResults">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            Copy
+                            COPY
                         </button>
                     </div>
                     <div id="tripletMiddleResults" class="p-5 font-kerning-custom text-2xl break-words results-container"></div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="border-b border-gray-200 flex justify-between items-center px-4 py-3 bg-gray-50">
-                        <span class="text-xs uppercase tracking-wider font-medium">Last position</span>
-                        <button class="copy-btn text-primary hover:text-primary/80 text-sm flex items-center" data-target="tripletLastResults">
+                <div class="results-box">
+                    <div class="results-header">
+                        <span class="text-xs uppercase tracking-wider font-bold">LAST POSITION</span>
+                        <button class="copy-btn text-black hover:text-gray-700 text-sm flex items-center" data-target="tripletLastResults">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            Copy
+                            COPY
                         </button>
                     </div>
                     <div id="tripletLastResults" class="p-5 font-kerning-custom text-2xl break-words results-container"></div>
@@ -313,9 +314,9 @@
         </div>
     </main>
     
-    <footer class="bg-dark text-light py-4 mt-12">
+    <footer class="bg-black text-white py-4 mt-12">
         <div class="container mx-auto px-4 max-w-6xl text-center">
-            <p class="text-sm opacity-80">Font Kerning Pair Checker Tool</p>
+            <p class="text-sm uppercase tracking-wider">KERNING PAIR CHECKER TOOL</p>
         </div>
     </footer>
 
@@ -343,6 +344,7 @@
         const stylisticSetSelect = document.getElementById('stylisticSetSelect');
         const regenerateButton = document.getElementById('regenerateButton');
         const copyAllButton = document.getElementById('copyAllButton');
+        const currentFontName = document.getElementById('currentFontName');
 
         // State
         let includeVietnamese = false;
@@ -351,7 +353,7 @@
         let includeLatinDiacritics = false;
         let includeSymbols = false;
         let includeLatin = true; // Always true
-        let customFontName = 'Cheltender-Regular'; // Default font name
+        let customFontName = 'CHELTENDER-REGULAR'; // Default font name
 
         // Font upload handling
         fontUpload.addEventListener('change', function(e) {
@@ -361,7 +363,7 @@
                 
                 reader.onload = function(e) {
                     const fontData = e.target.result;
-                    const fontName = file.name.split('.')[0];
+                    const fontName = file.name.split('.')[0].toUpperCase();
                     customFontName = fontName;
                     
                     // Create a new @font-face rule for the uploaded font
@@ -383,7 +385,7 @@
                     updateStyles();
                     
                     // Update the font name in the header
-                    document.querySelector('header p').textContent = `Font: ${fontName}`;
+                    currentFontName.textContent = fontName;
                 };
                 
                 reader.readAsDataURL(file);
@@ -541,150 +543,3 @@
             
             // Apply styles to all results
             updateStyles();
-        }
-
-        // Copy button functionality for individual sections
-        document.querySelectorAll('.copy-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const targetId = button.getAttribute('data-target');
-                const targetElement = document.getElementById(targetId);
-                
-                // Create a temporary textarea to hold the text
-                const textarea = document.createElement('textarea');
-                textarea.value = targetElement.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                // Visual feedback
-                const originalText = button.innerHTML;
-                button.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied!
-                `;
-                setTimeout(() => {
-                    button.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Copy
-                    `;
-                }, 2000);
-            });
-        });
-        
-        // Copy all button functionality
-        copyAllButton.addEventListener('click', () => {
-            // Collect all text content
-            const allSections = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
-            ];
-            
-            // Create headings and content
-            const sections = [
-                "--- LETTER PAIRS (First Position) ---\n",
-                allSections[0].textContent,
-                "\n\n--- LETTER PAIRS (Second Position) ---\n",
-                allSections[1].textContent,
-                "\n\n--- LETTER TRIPLETS (First Position) ---\n",
-                allSections[2].textContent,
-                "\n\n--- LETTER TRIPLETS (Middle Position) ---\n",
-                allSections[3].textContent,
-                "\n\n--- LETTER TRIPLETS (Last Position) ---\n",
-                allSections[4].textContent
-            ];
-            
-            // Create a temporary textarea to hold the text
-            const textarea = document.createElement('textarea');
-            textarea.value = sections.join('');
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            // Visual feedback
-            const originalContent = copyAllButton.innerHTML;
-            copyAllButton.innerHTML = `
-                <span class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    All Copied!
-                </span>
-            `;
-            setTimeout(() => {
-                copyAllButton.innerHTML = originalContent;
-            }, 2000);
-        });
-
-        // Add regenerate button functionality
-        regenerateButton.addEventListener('click', generatePairs);
-
-        // Update font styles, kerning, and stylistic sets
-        function updateStyles() {
-            const isKerningEnabled = toggleKerning.checked;
-            const fontSize = fontSizeSelect.value;
-            const selectedStylisticSet = stylisticSetSelect.value;
-            
-            // Get all result containers
-            const resultContainers = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
-            ];
-            
-            // Apply styles to all result containers
-            resultContainers.forEach(container => {
-                // Apply font size
-                container.classList.remove('text-xl', 'text-2xl', 'text-3xl', 'text-4xl');
-                container.classList.add(fontSize);
-                
-                // Apply custom font
-                container.style.fontFamily = `'${customFontName}', sans-serif`;
-                
-                // First, remove all stylistic set classes
-                for (let i = 1; i <= 20; i++) {
-                    const ssClass = `ss${i.toString().padStart(2, '0')}`;
-                    container.classList.remove(ssClass);
-                }
-                
-                // Clear any existing font-feature-settings
-                container.style.fontFeatureSettings = '';
-                
-                // Apply kerning and stylistic sets using inline style for proper combination
-                if (selectedStylisticSet !== 'none' && isKerningEnabled) {
-                    // Both kerning and stylistic set
-                    container.style.fontFeatureSettings = `"kern" 1, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (selectedStylisticSet !== 'none') {
-                    // Only stylistic set, no kerning
-                    container.style.fontFeatureSettings = `"kern" 0, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (isKerningEnabled) {
-                    // Only kerning, no stylistic set
-                    container.classList.add('kern-display');
-                    container.classList.remove('no-kern');
-                    container.style.fontFeatureSettings = '';
-                } else {
-                    // Neither kerning nor stylistic set
-                    container.classList.add('no-kern');
-                    container.classList.remove('kern-display');
-                    container.style.fontFeatureSettings = '';
-                }
-            });
-        }
-        
-        // Initialize with default styles
-        updateStyles();
-    </script>
-</body>
-</html>
