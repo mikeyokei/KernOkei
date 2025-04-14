@@ -1,159 +1,4 @@
-function getFormat(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            switch (ext) {
-                case 'ttf': return 'truetype';
-                case 'otf': return 'opentype';
-                case 'woff': return 'woff';
-                case 'woff2': return 'woff2';
-                default: return 'truetype';
-            }
-        }
-
-        // Copy button functionality for individual sections
-        document.querySelectorAll('.copy-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const targetId = button.getAttribute('data-target');
-                const targetElement = document.getElementById(targetId);
-                
-                // Create a temporary textarea to hold the text
-                const textarea = document.createElement('textarea');
-                textarea.value = targetElement.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                // Visual feedback
-                const originalText = button.innerHTML;
-                button.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied!
-                `;
-                setTimeout(() => {
-                    button.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Copy
-                    `;
-                }, 2000);
-            });
-        });
-        
-        // Copy all button functionality
-        copyAllButton.addEventListener('click', () => {
-            // Collect all text content
-            const allSections = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
-            ];
-            
-            // Create headings and content
-            const sections = [
-                "--- LETTER PAIRS (First Position) ---\n",
-                allSections[0].textContent,
-                "\n\n--- LETTER PAIRS (Second Position) ---\n",
-                allSections[1].textContent,
-                "\n\n--- LETTER TRIPLETS (First Position) ---\n",
-                allSections[2].textContent,
-                "\n\n--- LETTER TRIPLETS (Middle Position) ---\n",
-                allSections[3].textContent,
-                "\n\n--- LETTER TRIPLETS (Last Position) ---\n",
-                allSections[4].textContent
-            ];
-            
-            // Create a temporary textarea to hold the text
-            const textarea = document.createElement('textarea');
-            textarea.value = sections.join('');
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            // Visual feedback
-            const originalContent = copyAllButton.innerHTML;
-            copyAllButton.innerHTML = `
-                <span class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    All Copied!
-                </span>
-            `;
-            setTimeout(() => {
-                copyAllButton.innerHTML = originalContent;
-            }, 2000);
-        });
-
-        // Add regenerate button functionality
-        regenerateButton.addEventListener('click', generatePairs);
-
-        // Update font styles, kerning, and stylistic sets
-        function updateStyles() {
-            const isKerningEnabled = toggleKerning.checked;
-            const fontSize = fontSizeSelect.value;
-            const selectedStylisticSet = stylisticSetSelect.value;
-            
-            // Get all result containers
-            const resultContainers = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
-            ];
-            
-            // Apply styles to all result containers
-            resultContainers.forEach(container => {
-                // Apply font size
-                container.classList.remove('text-xl', 'text-2xl', 'text-3xl', 'text-4xl');
-                container.classList.add(fontSize);
-                
-                // Apply Cheltender font
-                container.style.fontFamily = `'${customFontName}', sans-serif`;
-                
-                // First, remove all stylistic set classes
-                for (let i = 1; i <= 20; i++) {
-                    const ssClass = `ss${i.toString().padStart(2, '0')}`;
-                    container.classList.remove(ssClass);
-                }
-                
-                // Clear any existing font-feature-settings
-                container.style.fontFeatureSettings = '';
-                
-                // Apply kerning and stylistic sets using inline style for proper combination
-                if (selectedStylisticSet !== 'none' && isKerningEnabled) {
-                    // Both kerning and stylistic set
-                    container.style.fontFeatureSettings = `"kern" 1, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (selectedStylisticSet !== 'none') {
-                    // Only stylistic set, no kerning
-                    container.style.fontFeatureSettings = `"kern" 0, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (isKerningEnabled) {
-                    // Only kerning, no stylistic set
-                    container.classList.add('kern-display');
-                    container.classList.remove('no-kern');
-                    container.style.fontFeatureSettings = '';
-                } else {
-                    // Neither kerning nor stylistic set
-                    container.classList.add('no-kern');
-                    container.classList.remove('kern-display');
-                    container.style.fontFeatureSettings = '';
-                }
-            });
-        }
-        
-        // Initialize with default styles
-        updateStyles();
-    </script>
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -506,6 +351,56 @@ function getFormat(filename) {
         let includeLatinDiacritics = false;
         let includeSymbols = false;
         let includeLatin = true; // Always true
+        let customFontName = 'Cheltender-Regular'; // Default font name
+
+        // Font upload handling
+        fontUpload.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const fontData = e.target.result;
+                    const fontName = file.name.split('.')[0];
+                    customFontName = fontName;
+                    
+                    // Create a new @font-face rule for the uploaded font
+                    const fontFace = `
+                        @font-face {
+                            font-family: '${fontName}';
+                            src: url('${fontData}') format('${getFormat(file.name)}');
+                            font-weight: normal;
+                            font-style: normal;
+                        }
+                    `;
+                    
+                    // Add the new font-face to the document
+                    const style = document.createElement('style');
+                    style.textContent = fontFace;
+                    document.head.appendChild(style);
+                    
+                    // Update all text with the new font
+                    updateStyles();
+                    
+                    // Update the font name in the header
+                    document.querySelector('header p').textContent = `Font: ${fontName}`;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Helper function to determine font format
+        function getFormat(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'ttf': return 'truetype';
+                case 'otf': return 'opentype';
+                case 'woff': return 'woff';
+                case 'woff2': return 'woff2';
+                default: return 'truetype';
+            }
+        }
 
         // Toggle button style helper
         function updateButtonStyle(button, isActive) {
@@ -626,4 +521,170 @@ function getFormat(filename) {
                     if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
                         const span = document.createElement('span');
                         span.textContent = charSet[i] + selectedLetter + charSet[j] + ' ';
-                        tripletMid
+                        tripletMiddleResults.appendChild(span);
+                    }
+                }
+            }
+            
+            // Last position triplets
+            const tripletLastResults = document.getElementById('tripletLastResults');
+            tripletLastResults.innerHTML = '';
+            for (let i = 0; i < charSet.length; i++) {
+                for (let j = 0; j < charSet.length; j++) {
+                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
+                        const span = document.createElement('span');
+                        span.textContent = charSet[i] + charSet[j] + selectedLetter + ' ';
+                        tripletLastResults.appendChild(span);
+                    }
+                }
+            }
+            
+            // Apply styles to all results
+            updateStyles();
+        }
+
+        // Copy button functionality for individual sections
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
+                
+                // Create a temporary textarea to hold the text
+                const textarea = document.createElement('textarea');
+                textarea.value = targetElement.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                // Visual feedback
+                const originalText = button.innerHTML;
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                    `;
+                }, 2000);
+            });
+        });
+        
+        // Copy all button functionality
+        copyAllButton.addEventListener('click', () => {
+            // Collect all text content
+            const allSections = [
+                document.getElementById('firstPosResults'),
+                document.getElementById('secondPosResults'),
+                document.getElementById('tripletFirstResults'),
+                document.getElementById('tripletMiddleResults'),
+                document.getElementById('tripletLastResults')
+            ];
+            
+            // Create headings and content
+            const sections = [
+                "--- LETTER PAIRS (First Position) ---\n",
+                allSections[0].textContent,
+                "\n\n--- LETTER PAIRS (Second Position) ---\n",
+                allSections[1].textContent,
+                "\n\n--- LETTER TRIPLETS (First Position) ---\n",
+                allSections[2].textContent,
+                "\n\n--- LETTER TRIPLETS (Middle Position) ---\n",
+                allSections[3].textContent,
+                "\n\n--- LETTER TRIPLETS (Last Position) ---\n",
+                allSections[4].textContent
+            ];
+            
+            // Create a temporary textarea to hold the text
+            const textarea = document.createElement('textarea');
+            textarea.value = sections.join('');
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            // Visual feedback
+            const originalContent = copyAllButton.innerHTML;
+            copyAllButton.innerHTML = `
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    All Copied!
+                </span>
+            `;
+            setTimeout(() => {
+                copyAllButton.innerHTML = originalContent;
+            }, 2000);
+        });
+
+        // Add regenerate button functionality
+        regenerateButton.addEventListener('click', generatePairs);
+
+        // Update font styles, kerning, and stylistic sets
+        function updateStyles() {
+            const isKerningEnabled = toggleKerning.checked;
+            const fontSize = fontSizeSelect.value;
+            const selectedStylisticSet = stylisticSetSelect.value;
+            
+            // Get all result containers
+            const resultContainers = [
+                document.getElementById('firstPosResults'),
+                document.getElementById('secondPosResults'),
+                document.getElementById('tripletFirstResults'),
+                document.getElementById('tripletMiddleResults'),
+                document.getElementById('tripletLastResults')
+            ];
+            
+            // Apply styles to all result containers
+            resultContainers.forEach(container => {
+                // Apply font size
+                container.classList.remove('text-xl', 'text-2xl', 'text-3xl', 'text-4xl');
+                container.classList.add(fontSize);
+                
+                // Apply custom font
+                container.style.fontFamily = `'${customFontName}', sans-serif`;
+                
+                // First, remove all stylistic set classes
+                for (let i = 1; i <= 20; i++) {
+                    const ssClass = `ss${i.toString().padStart(2, '0')}`;
+                    container.classList.remove(ssClass);
+                }
+                
+                // Clear any existing font-feature-settings
+                container.style.fontFeatureSettings = '';
+                
+                // Apply kerning and stylistic sets using inline style for proper combination
+                if (selectedStylisticSet !== 'none' && isKerningEnabled) {
+                    // Both kerning and stylistic set
+                    container.style.fontFeatureSettings = `"kern" 1, "${selectedStylisticSet}" 1`;
+                    container.classList.remove('kern-display', 'no-kern');
+                } else if (selectedStylisticSet !== 'none') {
+                    // Only stylistic set, no kerning
+                    container.style.fontFeatureSettings = `"kern" 0, "${selectedStylisticSet}" 1`;
+                    container.classList.remove('kern-display', 'no-kern');
+                } else if (isKerningEnabled) {
+                    // Only kerning, no stylistic set
+                    container.classList.add('kern-display');
+                    container.classList.remove('no-kern');
+                    container.style.fontFeatureSettings = '';
+                } else {
+                    // Neither kerning nor stylistic set
+                    container.classList.add('no-kern');
+                    container.classList.remove('kern-display');
+                    container.style.fontFeatureSettings = '';
+                }
+            });
+        }
+        
+        // Initialize with default styles
+        updateStyles();
+    </script>
+</body>
+</html>
