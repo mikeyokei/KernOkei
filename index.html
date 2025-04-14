@@ -6,9 +6,6 @@
     <title>Kerning Pair Checker</title>
     <meta name="description" content="A web-based tool for type designers and typographers to check kerning pairs in fonts. Test custom fonts with various character sets.">
     <meta name="author" content="mikeyokei">
-    <meta http-equiv="Content-Language" content="en,fr,de,es,it,pt,nl,fi,da,sv,no,ru,pl,cs,sk,hu,ro,bg,el,tr">
-    <meta property="og:title" content="Kerning Pair Checker">
-    <meta property="og:description" content="A web-based tool for type designers to check kerning pairs in multiple languages.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -48,19 +45,6 @@
                 z-index: -1;
                 content: url('Cheltender-Regular.woff2');
             }
-        }
-        
-        /* Improved font loading */
-        @font-face {
-            font-family: 'Preload-Cheltender';
-            src: local('Cheltender-Regular');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-            size-adjust: 100%;
-            ascent-override: normal;
-            descent-override: normal;
-            line-gap-override: normal;
         }
         
         /* Base kerning and stylistic set classes */
@@ -133,41 +117,16 @@
             @apply btn-accent;
         }
         
-        /* Results container - improved visibility */
+        /* Results container */
         .results-container {
             max-height: 250px;
-            min-height: 50px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #0FA3B1 transparent;
-            width: 100%;
-            position: relative;
-            word-wrap: break-word;
-            z-index: 10;
-        }
-        
-        .results-container:empty::after {
-            content: "Results will appear here";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgba(15, 163, 177, 0.4);
-            font-style: italic;
-            font-size: 0.9rem;
-        }
-        
-        .results-container span {
-            display: inline-block;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-            padding: 0.2rem 0.4rem;
-            background-color: rgba(15, 163, 177, 0.05);
-            border-radius: 2px;
+            scrollbar-color: #000 #fff;
         }
         
         .results-container::-webkit-scrollbar {
-            width: 4px;
+            width: 2px;
         }
         
         .results-container::-webkit-scrollbar-track {
@@ -175,12 +134,11 @@
         }
         
         .results-container::-webkit-scrollbar-thumb {
-            background-color: #0FA3B1;
-            border-radius: 2px;
+            background-color: #000;
         }
         
         .dark .results-container::-webkit-scrollbar-thumb {
-            background-color: #0FA3B1;
+            background-color: #fff;
         }
         
         /* Grid lines */
@@ -225,68 +183,13 @@
                     <div class="flex justify-between items-center mb-2">
                         <label for="selectedLetter" class="text-xs font-bold tracking-wide">SELECT LETTER</label>
                     </div>
-                    <div class="flex flex-col space-y-4 items-center border border-black/20 dark:border-white/20 p-2">
-                        <div class="flex w-full items-center space-x-4">
-                            <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-16 text-center text-3xl border border-black/40 dark:border-white/40 bg-transparent" />
-                            <div class="flex flex-col">
-                                <label for="specialCharSelect" class="text-xs mb-1">SELECT SPECIAL CHARACTER</label>
-                                <select id="specialCharSelect" class="w-full text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent">
-                                    <option value="">Choose a character...</option>
-                                    <optgroup label="Common Latin">
-                                        <option value="à">à (a grave)</option>
-                                        <option value="á">á (a acute)</option>
-                                        <option value="â">â (a circumflex)</option>
-                                        <option value="ä">ä (a diaeresis)</option>
-                                        <option value="ã">ã (a tilde)</option>
-                                        <option value="å">å (a ring)</option>
-                                        <option value="æ">æ (ae ligature)</option>
-                                        <option value="ç">ç (c cedilla)</option>
-                                        <option value="é">é (e acute)</option>
-                                        <option value="è">è (e grave)</option>
-                                        <option value="ê">ê (e circumflex)</option>
-                                        <option value="ë">ë (e diaeresis)</option>
-                                        <option value="í">í (i acute)</option>
-                                        <option value="ñ">ñ (n tilde)</option>
-                                        <option value="ó">ó (o acute)</option>
-                                        <option value="ô">ô (o circumflex)</option>
-                                        <option value="ö">ö (o diaeresis)</option>
-                                        <option value="ø">ø (o slash)</option>
-                                        <option value="ß">ß (sharp s)</option>
-                                        <option value="ú">ú (u acute)</option>
-                                        <option value="ü">ü (u diaeresis)</option>
-                                    </optgroup>
-                                    <optgroup label="Eastern European">
-                                        <option value="č">č (c caron)</option>
-                                        <option value="ř">ř (r caron)</option>
-                                        <option value="š">š (s caron)</option>
-                                        <option value="ž">ž (z caron)</option>
-                                        <option value="ą">ą (a ogonek)</option>
-                                        <option value="ę">ę (e ogonek)</option>
-                                        <option value="ł">ł (l stroke)</option>
-                                        <option value="ń">ń (n acute)</option>
-                                        <option value="ś">ś (s acute)</option>
-                                        <option value="ź">ź (z acute)</option>
-                                        <option value="ż">ż (z dot)</option>
-                                    </optgroup>
-                                    <optgroup label="Other Latin">
-                                        <option value="đ">đ (d stroke)</option>
-                                        <option value="ğ">ğ (g breve)</option>
-                                        <option value="ı">ı (dotless i)</option>
-                                        <option value="İ">İ (dotted I)</option>
-                                        <option value="ș">ș (s comma)</option>
-                                        <option value="ț">ț (t comma)</option>
-                                        <option value="þ">þ (thorn)</option>
-                                        <option value="ð">ð (eth)</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex space-x-4 w-full justify-end">
-                            <button id="checkButton" class="btn-accent relative overflow-hidden">
-                                <span>GENERATE</span>
-                                <span class="absolute inset-0 bg-white/20 dark:bg-black/20 opacity-0 transition-opacity duration-200" id="generateEffect"></span>
-                            </button>
-                        </div>
+                    <div class="flex space-x-4 items-center border border-black/20 dark:border-white/20 p-2">
+                        <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-16 text-center text-3xl border border-black/40 dark:border-white/40 bg-transparent" />
+                <div class="flex space-x-4">
+                    <button id="checkButton" class="btn-accent">
+                        GENERATE
+                    </button>
+                </div>
                     </div>
                 </div>
                 
@@ -296,16 +199,12 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2 border border-black/20 dark:border-white/20 p-2">
                         <button id="toggleLatinBtn" class="btn-outline btn-active" disabled>
-                            <span class="flex-grow text-center">LATIN BASIC</span>
+                            <span class="flex-grow text-center">LATIN</span>
                             <span class="inline-block w-2 h-2 bg-accent ml-2"></span>
                         </button>
                         <button id="toggleLatinDiacriticsBtn" class="btn-outline">
-                            <span class="flex-grow text-center">LATIN EXTENDED</span>
+                            <span class="flex-grow text-center">DIACRITICS</span>
                             <span id="diacriticsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="toggleCentralEuroBtn" class="btn-outline">
-                            <span class="flex-grow text-center">CENTRAL EUROPE</span>
-                            <span id="centralEuroIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
                         <button id="toggleVietnameseBtn" class="btn-outline">
                             <span class="flex-grow text-center">VIETNAMESE</span>
@@ -322,10 +221,6 @@
                         <button id="toggleSymbolsBtn" class="btn-outline">
                             <span class="flex-grow text-center">SYMBOLS</span>
                             <span id="symbolsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="toggleAllBtn" class="btn-outline">
-                            <span class="flex-grow text-center">ALL CHARACTERS</span>
-                            <span id="allCharsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
                     </div>
                 </div>
@@ -510,69 +405,23 @@
     </footer>
 
     <script>
-        // Character sets - Expanded to support more Latin languages
+        // Character sets
         const latinAlphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        
-        // Extended Latin diacritics covering most European languages
-        const latinDiacritics = 'àáâäæãåāèéêëēėęěîïíīįìôöòóœøōõûüùúūÿÀÁÂÄÆÃÅĀÈÉÊËĒĖĘĚÎÏÍĪĮÌÔÖÒÓŒØŌÕÛÜÙÚŪŸçÇñÑßðÐþÞ' + 
-            // Central European
-            'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ' +
-            // Czech, Slovak, Slovenian, Croatian, Hungarian
-            'čďěňřšťžČĎĚŇŘŠŤŽ' +
-            // Romanian
-            'ăâîșțĂÂÎȘȚ' +
-            // Turkish
-            'ğıİöüĞÖÜ' +
-            // Baltic
-            'āēīōūĀĒĪŌŪ' +
-            // Nordic
-            'åæøÅÆØ' +
-            // Icelandic
-            'ðþÐÞ' +
-            // Polish specific
-            'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ' +
-            // Other European diacritics
-            'ħĦĸĶĺĹľĽŀĿłŁ';
-            
-        // Vietnamese specific characters
+        const latinDiacritics = 'àáâäæãåāèéêëēėęîïíīįìôöòóœøōõûüùúūÿÀÁÂÄÆÃÅĀÈÉÊËĒĖĘÎÏÍĪĮÌÔÖÒÓŒØŌÕÛÜÙÚŪŸçÇñÑßðÐþÞ';
         const vietnameseChars = 'ăâđêôơưĂÂĐÊÔƠƯáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ';
-        
-        // Numbers - expanded to include numerals and fractions
-        const numbers = '0123456789' + 
-            // Superscript and subscript
-            '⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉' +
-            // Fractions
-            '½⅓¼⅕⅙⅐⅛⅑⅒⅔¾⅖⅗⅘⅚⅜⅝⅞' +
-            // Roman numerals
-            'ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫⅬⅭⅮⅯⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫⅬⅭⅮⅯ';
-            
-        // Expanded punctuation
-        const punctuation = '.,;:!?\'"\\/()[]{}<>@#$%^&*_-+=|~`' +
-            // Additional punctuation marks
-            '«»‹›""''‚„‟′″‴‵‶‷‸‹›''‚„※‧‿⁀⁁⁂⁃⁄⁅⁆⁊⁋⁌⁍⁎⁏⁐⁑⁒⁓⁕⁖⁗⁘⁙⁚⁛⁜⁝⁞';
-            
-        // Expanded symbols
-        const symbols = '€£¥₹₽¢¤§©®™°′″‰¶†‡•…‱⁂⁋⁎⁑⁠⁰⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎' +
-            // Currency symbols
-            '₠₡₢₣₤₥₦₧₨₩₪₫₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿' +
-            // Mathematical symbols
-            '∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿';
+        const numbers = '0123456789';
+        const punctuation = '.,;:!?\'"\\/()[]{}<>@#$%^&*_-+=|~`';
+        const symbols = '€£¥₹₽¢¤§©®™°′″‰¶†‡•…‱⁂⁋⁎⁑⁠⁰⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎';
 
-        // Extract Central European characters for the new category
-        const centralEuropeanChars = 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻčďěňřšťžČĎĚŇŘŠŤŽ';
-        
         // DOM Elements
         const selectedLetterInput = document.getElementById('selectedLetter');
-        const specialCharSelect = document.getElementById('specialCharSelect');
         const checkButton = document.getElementById('checkButton');
         const toggleVietnameseBtn = document.getElementById('toggleVietnameseBtn');
         const toggleNumbersBtn = document.getElementById('toggleNumbersBtn');
         const togglePunctuationBtn = document.getElementById('togglePunctuationBtn');
         const toggleLatinBtn = document.getElementById('toggleLatinBtn');
         const toggleLatinDiacriticsBtn = document.getElementById('toggleLatinDiacriticsBtn');
-        const toggleCentralEuroBtn = document.getElementById('toggleCentralEuroBtn');
         const toggleSymbolsBtn = document.getElementById('toggleSymbolsBtn');
-        const toggleAllBtn = document.getElementById('toggleAllBtn');
         const fontUpload = document.getElementById('fontUpload');
         const fontSizeSelect = document.getElementById('fontSizeSelect');
         const toggleKerning = document.getElementById('toggleKerning');
@@ -585,9 +434,7 @@
         let includeNumbers = false;
         let includePunctuation = false;
         let includeLatinDiacritics = false;
-        let includeCentralEuropean = false;
         let includeSymbols = false;
-        let includeAll = false;
         let includeLatin = true; // Always true
         let customFontName = 'Cheltender-Regular'; // Default font name
 
@@ -614,8 +461,6 @@
                 kerningDot.classList.remove('bg-accent');
                 kerningDot.classList.add('bg-black', 'dark:bg-white');
             }
-            
-            // Reapply styles immediately
             updateStyles();
         });
         
@@ -684,8 +529,6 @@
             else if (button.id === 'toggleNumbersBtn') indicatorId = 'numbersIndicator';
             else if (button.id === 'togglePunctuationBtn') indicatorId = 'punctuationIndicator';
             else if (button.id === 'toggleSymbolsBtn') indicatorId = 'symbolsIndicator';
-            else if (button.id === 'toggleCentralEuroBtn') indicatorId = 'centralEuroIndicator';
-            else if (button.id === 'toggleAllBtn') indicatorId = 'allCharsIndicator';
             
             const indicator = indicatorId ? document.getElementById(indicatorId) : null;
             
@@ -702,171 +545,67 @@
         toggleVietnameseBtn.addEventListener('click', () => {
             includeVietnamese = !includeVietnamese;
             updateButtonStyle(toggleVietnameseBtn, includeVietnamese);
-            updateAllButtonState();
             generatePairs();
         });
 
         toggleNumbersBtn.addEventListener('click', () => {
             includeNumbers = !includeNumbers;
             updateButtonStyle(toggleNumbersBtn, includeNumbers);
-            updateAllButtonState();
             generatePairs();
         });
 
         togglePunctuationBtn.addEventListener('click', () => {
             includePunctuation = !includePunctuation;
             updateButtonStyle(togglePunctuationBtn, includePunctuation);
-            updateAllButtonState();
             generatePairs();
         });
         
         toggleLatinDiacriticsBtn.addEventListener('click', () => {
             includeLatinDiacritics = !includeLatinDiacritics;
             updateButtonStyle(toggleLatinDiacriticsBtn, includeLatinDiacritics);
-            updateAllButtonState();
-            generatePairs();
-        });
-        
-        toggleCentralEuroBtn.addEventListener('click', () => {
-            includeCentralEuropean = !includeCentralEuropean;
-            updateButtonStyle(toggleCentralEuroBtn, includeCentralEuropean);
-            updateAllButtonState();
             generatePairs();
         });
         
         toggleSymbolsBtn.addEventListener('click', () => {
             includeSymbols = !includeSymbols;
             updateButtonStyle(toggleSymbolsBtn, includeSymbols);
-            updateAllButtonState();
             generatePairs();
         });
-        
-        // Toggle all character sets
-        toggleAllBtn.addEventListener('click', () => {
-            includeAll = !includeAll;
-            
-            // Update all buttons based on the "All" toggle state
-            includeLatinDiacritics = includeAll;
-            includeCentralEuropean = includeAll;
-            includeVietnamese = includeAll;
-            includeNumbers = includeAll;
-            includePunctuation = includeAll;
-            includeSymbols = includeAll;
-            
-            // Update indicators for all buttons
-            updateButtonStyle(toggleLatinDiacriticsBtn, includeLatinDiacritics);
-            updateButtonStyle(toggleCentralEuroBtn, includeCentralEuropean);
-            updateButtonStyle(toggleVietnameseBtn, includeVietnamese);
-            updateButtonStyle(toggleNumbersBtn, includeNumbers);
-            updateButtonStyle(togglePunctuationBtn, includePunctuation);
-            updateButtonStyle(toggleSymbolsBtn, includeSymbols);
-            updateButtonStyle(toggleAllBtn, includeAll);
-            
-            generatePairs();
-        });
-        
-        // Helper to update the "ALL" button state
-        function updateAllButtonState() {
-            const allActive = includeLatinDiacritics && includeCentralEuropean && includeVietnamese && 
-                           includeNumbers && includePunctuation && includeSymbols;
-            includeAll = allActive;
-            updateButtonStyle(toggleAllBtn, includeAll);
-        }
 
         // Font size, kerning, and stylistic set change listeners
         fontSizeSelect.addEventListener('change', updateStyles);
         toggleKerning.addEventListener('change', updateStyles);
         stylisticSetSelect.addEventListener('change', updateStyles);
 
-        // Generate pairs and triplets when the button is clicked with visual feedback
-        checkButton.addEventListener('click', function() {
-            // Show button effect
-            const effect = document.getElementById('generateEffect');
-            effect.classList.add('opacity-100');
-            
-            // Animate the results heading
-            const resultsHeading = document.querySelector('.text-xl.font-bold');
-            resultsHeading.classList.add('text-accent');
-            
-            setTimeout(() => {
-                effect.classList.remove('opacity-100');
-                setTimeout(() => {
-                    resultsHeading.classList.remove('text-accent');
-                }, 300);
-            }, 400);
-            
-            generatePairs();
-        });
+        // Generate pairs and triplets when the button is clicked
+        checkButton.addEventListener('click', generatePairs);
 
         // Allow generating pairs by pressing Enter in the input field
         selectedLetterInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                // Trigger the same visual effects as clicking the button
-                const effect = document.getElementById('generateEffect');
-                effect.classList.add('opacity-100');
-                
-                // Generate pairs
                 generatePairs();
-                
-                // Scroll to results
-                setTimeout(() => {
-                    document.querySelector('.text-xl.font-bold').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    effect.classList.remove('opacity-100');
-                }, 400);
             }
         });
 
         // Set initial focus
         selectedLetterInput.focus();
-        
-        // Special character selector with improved handling
-        specialCharSelect.addEventListener('change', function() {
-            if (this.value) {
-                // Set the input value
-                selectedLetterInput.value = this.value;
-                
-                // Focus on the input to enable continuing typing
-                selectedLetterInput.focus();
-                
-                // Create a flash effect to indicate the character was selected
-                selectedLetterInput.classList.add('bg-accent/20');
-                setTimeout(() => {
-                    selectedLetterInput.classList.remove('bg-accent/20');
-                }, 300);
-                
-                // Reset the dropdown after selection
-                setTimeout(() => {
-                    this.value = '';
-                }, 100);
-            }
-        });
 
         // Main function to generate pairs and triplets with performance optimizations
         function generatePairs() {
-            console.log("Generating pairs...");
             const selectedLetter = selectedLetterInput.value;
             
             if (!selectedLetter) {
                 alert('Please enter a letter first');
                 return;
             }
-            
-            // Add visual feedback
-            document.querySelector(".text-xl.font-bold").classList.add("text-accent");
-            setTimeout(() => {
-                document.querySelector(".text-xl.font-bold").classList.remove("text-accent");
-            }, 500);
 
             // Get the active character set
             let charSet = latinAlphabet;
             if (includeLatinDiacritics) charSet += latinDiacritics;
-            if (includeCentralEuropean) charSet += centralEuropeanChars;
             if (includeVietnamese) charSet += vietnameseChars;
             if (includeNumbers) charSet += numbers;
             if (includePunctuation) charSet += punctuation;
             if (includeSymbols) charSet += symbols;
-            
-            console.log(`Character set size: ${charSet.length} characters`);
 
             // Generate results
             
@@ -893,13 +632,6 @@
                 tripletLast: document.createDocumentFragment()
             };
             
-            // Safety check - if charset is extremely large, limit to a reasonable size to prevent browser hanging
-            const maxChars = 1000;
-            if (charSet.length > maxChars) {
-                charSet = charSet.substring(0, maxChars);
-                console.warn(`Character set limited to ${maxChars} characters for performance.`);
-            }
-            
             // Generate pairs (much faster with a single loop)
             const charSetArray = [...charSet];
             const charSetLength = charSetArray.length;
@@ -918,15 +650,8 @@
                 fragments.secondPos.appendChild(secondPosSpan);
                 
                 // Only generate triplets at specified intervals (every 5th character)
-                // Use a more aggressive sampling for large character sets to prevent overloading the browser
-                const sampleRate = charSetLength > 200 ? 10 : 5;
-                
-                if (i % sampleRate === 0) {
-                    // For triplets, sample more aggressively for large charsets
-                    const tripletSampleRate = charSetLength > 200 ? 15 : 
-                                            charSetLength > 100 ? 10 : 5;
-                    
-                    for (let j = 0; j < charSetLength; j += tripletSampleRate) {
+                if (i % 5 === 0) {
+                    for (let j = 0; j < charSetLength; j += 5) {
                         const char2 = charSetArray[j];
                         
                         // Triplets
@@ -946,41 +671,11 @@
             }
             
             // Append all fragments to the DOM (only 5 reflows instead of hundreds)
-            const firstPosContainer = document.getElementById('firstPosResults');
-            const secondPosContainer = document.getElementById('secondPosResults');
-            const tripletFirstContainer = document.getElementById('tripletFirstResults');
-            const tripletMiddleContainer = document.getElementById('tripletMiddleResults');
-            const tripletLastContainer = document.getElementById('tripletLastResults');
-            
-            console.log("Result containers:", 
-                firstPosContainer ? "First pos exists" : "First pos MISSING",
-                secondPosContainer ? "Second pos exists" : "Second pos MISSING",
-                tripletFirstContainer ? "Triplet first exists" : "Triplet first MISSING",
-                tripletMiddleContainer ? "Triplet middle exists" : "Triplet middle MISSING",
-                tripletLastContainer ? "Triplet last exists" : "Triplet last MISSING"
-            );
-            
-            // Add debug styles to make containers more visible
-            [firstPosContainer, secondPosContainer, tripletFirstContainer, tripletMiddleContainer, tripletLastContainer].forEach(container => {
-                if (container) {
-                    container.style.minHeight = "60px";
-                    container.style.border = "1px solid #0FA3B1";
-                }
-            });
-            
-            firstPosContainer.appendChild(fragments.firstPos);
-            secondPosContainer.appendChild(fragments.secondPos);
-            tripletFirstContainer.appendChild(fragments.tripletFirst);
-            tripletMiddleContainer.appendChild(fragments.tripletMiddle);
-            tripletLastContainer.appendChild(fragments.tripletLast);
-            
-            console.log("Fragments appended!");
-            
-            const firstPosContent = firstPosContainer.textContent;
-            console.log(`First pos has ${firstPosContent.length} characters of content`);
-            if (firstPosContent.length < 50) {
-                console.log("First position sample:", firstPosContent);
-            }
+            document.getElementById('firstPosResults').appendChild(fragments.firstPos);
+            document.getElementById('secondPosResults').appendChild(fragments.secondPos);
+            document.getElementById('tripletFirstResults').appendChild(fragments.tripletFirst);
+            document.getElementById('tripletMiddleResults').appendChild(fragments.tripletMiddle);
+            document.getElementById('tripletLastResults').appendChild(fragments.tripletLast);
             
             // Apply styles to all results
             updateStyles();
@@ -1099,8 +794,6 @@
                 document.getElementById('tripletMiddleResults'),
                 document.getElementById('tripletLastResults')
             ];
-            
-            console.log("Applying styles to containers:", resultContainers.map(c => c ? c.id : "missing"));
             
             // Apply styles to all result containers
             resultContainers.forEach(container => {
