@@ -82,20 +82,39 @@
             font-family: 'Cheltender-Regular', sans-serif;
         }
         
-        /* Custom block button - Redesigned from pill to block */
+        /* Unified button styles */
+        .btn {
+            @apply border border-black/80 flex items-center justify-center py-2 px-4 h-10 text-sm
+                   dark:border-white/80 hover:border-accent hover:text-accent 
+                   dark:hover:border-accent dark:hover:text-accent transition-all duration-200;
+        }
+        
+        /* Standard button (outlined) */
+        .btn-outline {
+            @apply btn;
+        }
+        
+        /* Filled button (accent color) */
+        .btn-accent {
+            @apply btn bg-accent text-black border-accent hover:bg-accent/80 hover:text-black dark:hover:text-black;
+        }
+        
+        /* Active state for any button */
+        .btn-active {
+            @apply bg-accent text-black border-accent;
+        }
+        
+        /* Legacy button classes for backward compatibility */
         .block-button {
-            @apply border border-black flex items-center justify-center py-2 px-4 h-10 text-sm
-                   dark:border-white hover:bg-black hover:text-white 
-                   dark:hover:bg-white dark:hover:text-black transition-colors duration-200;
+            @apply btn-outline;
         }
         
         .block-button-active {
-            @apply bg-accent text-black border-accent;
+            @apply btn-active;
         }
-
-        /* Action button - made consistent with block buttons */
+        
         .action-button {
-            @apply border border-black bg-accent text-black px-4 py-2 h-10 inline-flex items-center justify-center text-sm font-bold transition-colors duration-200;
+            @apply btn-accent;
         }
         
         /* Results container */
@@ -135,7 +154,11 @@
             @apply bg-black/20 dark:bg-white/20;
         }
 
-        /* Copy button hover */
+        /* Copy button styles */
+        .copy-btn {
+            @apply text-black/60 dark:text-white/60 transition-all duration-200;
+        }
+        
         .copy-btn:hover {
             @apply text-accent;
         }
@@ -163,7 +186,7 @@
                     <div class="flex space-x-4 items-center border border-black/20 dark:border-white/20 p-2">
                         <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-16 text-center text-3xl border border-black/40 dark:border-white/40 bg-transparent" />
                 <div class="flex space-x-4">
-                    <button id="checkButton" class="action-button">
+                    <button id="checkButton" class="btn-accent">
                         GENERATE
                     </button>
                 </div>
@@ -175,29 +198,29 @@
                         <label class="text-xs font-bold tracking-wide">CHARACTER SETS</label>
                     </div>
                     <div class="grid grid-cols-2 gap-2 border border-black/20 dark:border-white/20 p-2">
-                        <button id="toggleLatinBtn" class="block-button block-button-active" disabled>
+                        <button id="toggleLatinBtn" class="btn-outline btn-active" disabled>
                             <span class="flex-grow text-center">LATIN</span>
                             <span class="inline-block w-2 h-2 bg-accent ml-2"></span>
                         </button>
-                        <button id="toggleLatinDiacriticsBtn" class="block-button">
+                        <button id="toggleLatinDiacriticsBtn" class="btn-outline">
                             <span class="flex-grow text-center">DIACRITICS</span>
-                            <span id="diacriticsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                            <span id="diacriticsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
-                        <button id="toggleVietnameseBtn" class="block-button">
+                        <button id="toggleVietnameseBtn" class="btn-outline">
                             <span class="flex-grow text-center">VIETNAMESE</span>
-                            <span id="vietnameseIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                            <span id="vietnameseIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
-                        <button id="toggleNumbersBtn" class="block-button">
+                        <button id="toggleNumbersBtn" class="btn-outline">
                             <span class="flex-grow text-center">NUMBERS</span>
-                            <span id="numbersIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                            <span id="numbersIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
-                        <button id="togglePunctuationBtn" class="block-button">
+                        <button id="togglePunctuationBtn" class="btn-outline">
                             <span class="flex-grow text-center">PUNCTUATION</span>
-                            <span id="punctuationIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                            <span id="punctuationIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
-                        <button id="toggleSymbolsBtn" class="block-button">
+                        <button id="toggleSymbolsBtn" class="btn-outline">
                             <span class="flex-grow text-center">SYMBOLS</span>
-                            <span id="symbolsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                            <span id="symbolsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
                         </button>
                     </div>
                 </div>
@@ -220,7 +243,7 @@
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleKerning" class="sr-only" checked />
                             <div class="relative inline-block w-10 h-5 rounded-none bg-black/10 dark:bg-white/10 mr-2">
-                                <div class="dot absolute left-0.5 top-0.5 w-4 h-4 bg-black dark:bg-white transition-transform" id="kerningDot"></div>
+                                <div class="dot absolute left-0.5 top-0.5 w-4 h-4 bg-black dark:bg-white transition-all duration-200" id="kerningDot"></div>
                             </div>
                             <span class="text-xs">ENABLE</span>
                         </label>
@@ -274,10 +297,8 @@
         <div class="mt-12 mb-6">
             <div class="flex items-center justify-between">
                 <div class="text-xl font-bold">RESULTS</div>
-                <div class="flex space-x-4">
-                    <button id="copyAllButton" class="block-button">COPY ALL</button>
-                    <div class="h-10 w-px bg-black/20 dark:bg-white/20"></div>
-                    <button id="regenerateButton" class="block-button hidden">REGENERATE</button>
+                <div>
+                    <button id="copyAllButton" class="btn-outline">COPY ALL</button>
                 </div>
             </div>
             
@@ -297,7 +318,7 @@
                             <span class="text-xs font-bold mr-2">A.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="firstPosResults">
+                        <button class="copy-btn text-xs" data-target="firstPosResults">
                             COPY
                         </button>
                     </div>
@@ -311,7 +332,7 @@
                             <span class="text-xs font-bold mr-2">A.2</span>
                             <span class="text-xs">SECOND POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="secondPosResults">
+                        <button class="copy-btn text-xs" data-target="secondPosResults">
                             COPY
                         </button>
                     </div>
@@ -333,7 +354,7 @@
                             <span class="text-xs font-bold mr-2">B.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletFirstResults">
+                        <button class="copy-btn text-xs" data-target="tripletFirstResults">
                             COPY
                         </button>
                     </div>
@@ -347,7 +368,7 @@
                             <span class="text-xs font-bold mr-2">B.2</span>
                             <span class="text-xs">MIDDLE POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletMiddleResults">
+                        <button class="copy-btn text-xs" data-target="tripletMiddleResults">
                             COPY
                         </button>
                     </div>
@@ -361,7 +382,7 @@
                             <span class="text-xs font-bold mr-2">B.3</span>
                             <span class="text-xs">LAST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletLastResults">
+                        <button class="copy-btn text-xs" data-target="tripletLastResults">
                             COPY
                         </button>
                     </div>
@@ -406,7 +427,6 @@
         const toggleKerning = document.getElementById('toggleKerning');
         const kerningDot = document.getElementById('kerningDot');
         const stylisticSetSelect = document.getElementById('stylisticSetSelect');
-        const regenerateButton = document.getElementById('regenerateButton');
         const copyAllButton = document.getElementById('copyAllButton');
 
         // State
@@ -513,10 +533,10 @@
             const indicator = indicatorId ? document.getElementById(indicatorId) : null;
             
             if (isActive) {
-                button.classList.add('block-button-active');
+                button.classList.add('btn-active');
                 if (indicator) indicator.classList.remove('opacity-0');
             } else {
-                button.classList.remove('block-button-active');
+                button.classList.remove('btn-active');
                 if (indicator) indicator.classList.add('opacity-0');
             }
         }
@@ -587,8 +607,7 @@
             if (includePunctuation) charSet += punctuation;
             if (includeSymbols) charSet += symbols;
 
-            // Show regenerate button if it's hidden
-            regenerateButton.classList.remove('hidden');
+            // Generate results
             
             // Use DocumentFragment for better performance
             const resultIds = [
@@ -735,10 +754,10 @@
                 // Visual feedback
                 const originalContent = copyAllButton.textContent;
                 copyAllButton.textContent = 'ALL COPIED';
-                copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
+                copyAllButton.classList.add('btn-active');
                 setTimeout(() => {
                     copyAllButton.textContent = originalContent;
-                    copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
+                    copyAllButton.classList.remove('btn-active');
                 }, 2000);
             } catch (err) {
                 // Fallback to old method if Clipboard API fails
@@ -752,16 +771,14 @@
                 // Visual feedback
                 const originalContent = copyAllButton.textContent;
                 copyAllButton.textContent = 'ALL COPIED';
-                copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
+                copyAllButton.classList.add('btn-active');
                 setTimeout(() => {
                     copyAllButton.textContent = originalContent;
-                    copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
+                    copyAllButton.classList.remove('btn-active');
                 }, 2000);
             }
         });
 
-        // Add regenerate button functionality
-        regenerateButton.addEventListener('click', generatePairs);
 
         // Update font styles, kerning, and stylistic sets
         function updateStyles() {
