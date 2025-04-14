@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerning Pair Checker</title>
+    <meta name="description" content="A web-based tool for type designers and typographers to check kerning pairs in fonts. Test custom fonts with various character sets.">
+    <meta name="author" content="mikeyokei">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,6 +33,18 @@
             font-weight: normal;
             font-style: normal;
             font-display: swap;
+        }
+        
+        /* Preload critical fonts */
+        @media screen {
+            :root::before {
+                position: absolute;
+                width: 0;
+                height: 0;
+                overflow: hidden;
+                z-index: -1;
+                content: url('Cheltender-Regular.woff2');
+            }
         }
         
         /* Base kerning and stylistic set classes */
@@ -364,7 +378,7 @@
                 <div class="text-xs opacity-60">V.2.0</div>
             </div>
             <div class="text-xs opacity-60 text-center">
-                Designed by <a href="https://www.instagram.com/mikeyokei/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">Mike Yokei</a> • <a href="https://readymag.website/u31066456/5044520/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">Website</a>
+                Designed by <a href="https://www.instagram.com/mikeyokei/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">mikeyokei</a> • <a href="https://readymag.website/u31066456/5044520/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">Website</a>
             </div>
         </div>
     </footer>
@@ -556,7 +570,7 @@
         // Set initial focus
         selectedLetterInput.focus();
 
-        // Main function to generate pairs and triplets
+        // Main function to generate pairs and triplets with performance optimizations
         function generatePairs() {
             const selectedLetter = selectedLetterInput.value;
             
@@ -576,102 +590,129 @@
             // Show regenerate button if it's hidden
             regenerateButton.classList.remove('hidden');
             
-            // First position pairs
-            const firstPosResults = document.getElementById('firstPosResults');
-            firstPosResults.innerHTML = '';
-            for (const char of charSet) {
-                const span = document.createElement('span');
-                span.textContent = selectedLetter + char + ' ';
-                firstPosResults.appendChild(span);
-            }
+            // Use DocumentFragment for better performance
+            const resultIds = [
+                'firstPosResults', 
+                'secondPosResults', 
+                'tripletFirstResults', 
+                'tripletMiddleResults', 
+                'tripletLastResults'
+            ];
             
-            // Second position pairs
-            const secondPosResults = document.getElementById('secondPosResults');
-            secondPosResults.innerHTML = '';
-            for (const char of charSet) {
-                const span = document.createElement('span');
-                span.textContent = char + selectedLetter + ' ';
-                secondPosResults.appendChild(span);
-            }
+            // Clear all results at once
+            resultIds.forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
             
-            // First position triplets
-            const tripletFirstResults = document.getElementById('tripletFirstResults');
-            tripletFirstResults.innerHTML = '';
-            for (let i = 0; i < charSet.length; i++) {
-                for (let j = 0; j < charSet.length; j++) {
-                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
-                        const span = document.createElement('span');
-                        span.textContent = selectedLetter + charSet[i] + charSet[j] + ' ';
-                        tripletFirstResults.appendChild(span);
+            // Create fragments for better performance
+            const fragments = {
+                firstPos: document.createDocumentFragment(),
+                secondPos: document.createDocumentFragment(),
+                tripletFirst: document.createDocumentFragment(),
+                tripletMiddle: document.createDocumentFragment(),
+                tripletLast: document.createDocumentFragment()
+            };
+            
+            // Generate pairs (much faster with a single loop)
+            const charSetArray = [...charSet];
+            const charSetLength = charSetArray.length;
+            
+            // First create all spans in a single pass
+            for (let i = 0; i < charSetLength; i++) {
+                const char = charSetArray[i];
+                
+                // Pairs
+                const firstPosSpan = document.createElement('span');
+                firstPosSpan.textContent = selectedLetter + char + ' ';
+                fragments.firstPos.appendChild(firstPosSpan);
+                
+                const secondPosSpan = document.createElement('span');
+                secondPosSpan.textContent = char + selectedLetter + ' ';
+                fragments.secondPos.appendChild(secondPosSpan);
+                
+                // Only generate triplets at specified intervals (every 5th character)
+                if (i % 5 === 0) {
+                    for (let j = 0; j < charSetLength; j += 5) {
+                        const char2 = charSetArray[j];
+                        
+                        // Triplets
+                        const tripletFirstSpan = document.createElement('span');
+                        tripletFirstSpan.textContent = selectedLetter + char + char2 + ' ';
+                        fragments.tripletFirst.appendChild(tripletFirstSpan);
+                        
+                        const tripletMiddleSpan = document.createElement('span');
+                        tripletMiddleSpan.textContent = char + selectedLetter + char2 + ' ';
+                        fragments.tripletMiddle.appendChild(tripletMiddleSpan);
+                        
+                        const tripletLastSpan = document.createElement('span');
+                        tripletLastSpan.textContent = char + char2 + selectedLetter + ' ';
+                        fragments.tripletLast.appendChild(tripletLastSpan);
                     }
                 }
             }
             
-            // Middle position triplets
-            const tripletMiddleResults = document.getElementById('tripletMiddleResults');
-            tripletMiddleResults.innerHTML = '';
-            for (let i = 0; i < charSet.length; i++) {
-                for (let j = 0; j < charSet.length; j++) {
-                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
-                        const span = document.createElement('span');
-                        span.textContent = charSet[i] + selectedLetter + charSet[j] + ' ';
-                        tripletMiddleResults.appendChild(span);
-                    }
-                }
-            }
-            
-            // Last position triplets
-            const tripletLastResults = document.getElementById('tripletLastResults');
-            tripletLastResults.innerHTML = '';
-            for (let i = 0; i < charSet.length; i++) {
-                for (let j = 0; j < charSet.length; j++) {
-                    if (i % 5 === 0 && j % 5 === 0) { // Limit triplets to avoid too many
-                        const span = document.createElement('span');
-                        span.textContent = charSet[i] + charSet[j] + selectedLetter + ' ';
-                        tripletLastResults.appendChild(span);
-                    }
-                }
-            }
+            // Append all fragments to the DOM (only 5 reflows instead of hundreds)
+            document.getElementById('firstPosResults').appendChild(fragments.firstPos);
+            document.getElementById('secondPosResults').appendChild(fragments.secondPos);
+            document.getElementById('tripletFirstResults').appendChild(fragments.tripletFirst);
+            document.getElementById('tripletMiddleResults').appendChild(fragments.tripletMiddle);
+            document.getElementById('tripletLastResults').appendChild(fragments.tripletLast);
             
             // Apply styles to all results
             updateStyles();
         }
 
-        // Copy button functionality for individual sections
+        // Copy button functionality for individual sections using modern Clipboard API
         document.querySelectorAll('.copy-btn').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => {
                 const targetId = button.getAttribute('data-target');
                 const targetElement = document.getElementById(targetId);
                 
-                // Create a temporary textarea to hold the text
-                const textarea = document.createElement('textarea');
-                textarea.value = targetElement.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                // Visual feedback
-                const originalText = button.textContent.trim();
-                button.textContent = 'COPIED';
-                button.classList.remove('opacity-60');
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.add('opacity-60');
-                }, 2000);
+                try {
+                    // Use modern Clipboard API
+                    await navigator.clipboard.writeText(targetElement.textContent);
+                    
+                    // Visual feedback
+                    const originalText = button.textContent.trim();
+                    button.textContent = 'COPIED';
+                    button.classList.remove('opacity-60');
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.add('opacity-60');
+                    }, 2000);
+                } catch (err) {
+                    // Fallback to old method if Clipboard API fails
+                    const textarea = document.createElement('textarea');
+                    textarea.value = targetElement.textContent;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    // Visual feedback
+                    const originalText = button.textContent.trim();
+                    button.textContent = 'COPIED';
+                    button.classList.remove('opacity-60');
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.add('opacity-60');
+                    }, 2000);
+                }
             });
         });
         
-        // Visual feedback on copy actions
-        copyAllButton.addEventListener('click', () => {
+        // Visual feedback on copy actions using modern Clipboard API
+        copyAllButton.addEventListener('click', async () => {
             // Collect all text content
-            const allSections = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
+            const resultIds = [
+                'firstPosResults', 
+                'secondPosResults', 
+                'tripletFirstResults', 
+                'tripletMiddleResults', 
+                'tripletLastResults'
             ];
+            
+            const allSections = resultIds.map(id => document.getElementById(id));
             
             // Create headings and content
             const sections = [
@@ -687,22 +728,36 @@
                 allSections[4].textContent
             ];
             
-            // Create a temporary textarea to hold the text
-            const textarea = document.createElement('textarea');
-            textarea.value = sections.join('');
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            // Visual feedback
-            const originalContent = copyAllButton.textContent;
-            copyAllButton.textContent = 'ALL COPIED';
-            copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
-            setTimeout(() => {
-                copyAllButton.textContent = originalContent;
-                copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
-            }, 2000);
+            try {
+                // Use modern Clipboard API
+                await navigator.clipboard.writeText(sections.join(''));
+                
+                // Visual feedback
+                const originalContent = copyAllButton.textContent;
+                copyAllButton.textContent = 'ALL COPIED';
+                copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
+                setTimeout(() => {
+                    copyAllButton.textContent = originalContent;
+                    copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
+                }, 2000);
+            } catch (err) {
+                // Fallback to old method if Clipboard API fails
+                const textarea = document.createElement('textarea');
+                textarea.value = sections.join('');
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                // Visual feedback
+                const originalContent = copyAllButton.textContent;
+                copyAllButton.textContent = 'ALL COPIED';
+                copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
+                setTimeout(() => {
+                    copyAllButton.textContent = originalContent;
+                    copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
+                }, 2000);
+            }
         });
 
         // Add regenerate button functionality
