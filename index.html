@@ -6,6 +6,9 @@
     <title>Kerning Pair Checker</title>
     <meta name="description" content="A web-based tool for type designers and typographers to check kerning pairs in fonts. Test custom fonts with various character sets.">
     <meta name="author" content="mikeyokei">
+    <meta http-equiv="Content-Language" content="en,fr,de,es,it,pt,nl,fi,da,sv,no,ru,pl,cs,sk,hu,ro,bg,el,tr">
+    <meta property="og:title" content="Kerning Pair Checker">
+    <meta property="og:description" content="A web-based tool for type designers to check kerning pairs in multiple languages.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -571,6 +574,8 @@
                 kerningDot.classList.remove('bg-accent');
                 kerningDot.classList.add('bg-black', 'dark:bg-white');
             }
+            
+            // Reapply styles immediately
             updateStyles();
         });
         
@@ -746,15 +751,25 @@
         // Set initial focus
         selectedLetterInput.focus();
         
-        // Special character selector
+        // Special character selector with improved handling
         specialCharSelect.addEventListener('change', function() {
             if (this.value) {
+                // Set the input value
                 selectedLetterInput.value = this.value;
+                
+                // Focus on the input to enable continuing typing
                 selectedLetterInput.focus();
+                
+                // Create a flash effect to indicate the character was selected
+                selectedLetterInput.classList.add('bg-accent/20');
+                setTimeout(() => {
+                    selectedLetterInput.classList.remove('bg-accent/20');
+                }, 300);
+                
                 // Reset the dropdown after selection
                 setTimeout(() => {
                     this.value = '';
-                }, 500);
+                }, 100);
             }
         });
 
@@ -801,6 +816,13 @@
                 tripletLast: document.createDocumentFragment()
             };
             
+            // Safety check - if charset is extremely large, limit to a reasonable size to prevent browser hanging
+            const maxChars = 1000;
+            if (charSet.length > maxChars) {
+                charSet = charSet.substring(0, maxChars);
+                console.warn(`Character set limited to ${maxChars} characters for performance.`);
+            }
+            
             // Generate pairs (much faster with a single loop)
             const charSetArray = [...charSet];
             const charSetLength = charSetArray.length;
@@ -819,8 +841,15 @@
                 fragments.secondPos.appendChild(secondPosSpan);
                 
                 // Only generate triplets at specified intervals (every 5th character)
-                if (i % 5 === 0) {
-                    for (let j = 0; j < charSetLength; j += 5) {
+                // Use a more aggressive sampling for large character sets to prevent overloading the browser
+                const sampleRate = charSetLength > 200 ? 10 : 5;
+                
+                if (i % sampleRate === 0) {
+                    // For triplets, sample more aggressively for large charsets
+                    const tripletSampleRate = charSetLength > 200 ? 15 : 
+                                            charSetLength > 100 ? 10 : 5;
+                    
+                    for (let j = 0; j < charSetLength; j += tripletSampleRate) {
                         const char2 = charSetArray[j];
                         
                         // Triplets
