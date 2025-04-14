@@ -50,6 +50,19 @@
             }
         }
         
+        /* Improved font loading */
+        @font-face {
+            font-family: 'Preload-Cheltender';
+            src: local('Cheltender-Regular');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+            size-adjust: 100%;
+            ascent-override: normal;
+            descent-override: normal;
+            line-gap-override: normal;
+        }
+        
         /* Base kerning and stylistic set classes */
         .kern-display {
             font-feature-settings: "kern" 1;
@@ -120,16 +133,41 @@
             @apply btn-accent;
         }
         
-        /* Results container */
+        /* Results container - improved visibility */
         .results-container {
             max-height: 250px;
+            min-height: 50px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #000 #fff;
+            scrollbar-color: #0FA3B1 transparent;
+            width: 100%;
+            position: relative;
+            word-wrap: break-word;
+            z-index: 10;
+        }
+        
+        .results-container:empty::after {
+            content: "Results will appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(15, 163, 177, 0.4);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .results-container span {
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.2rem 0.4rem;
+            background-color: rgba(15, 163, 177, 0.05);
+            border-radius: 2px;
         }
         
         .results-container::-webkit-scrollbar {
-            width: 2px;
+            width: 4px;
         }
         
         .results-container::-webkit-scrollbar-track {
@@ -137,11 +175,12 @@
         }
         
         .results-container::-webkit-scrollbar-thumb {
-            background-color: #000;
+            background-color: #0FA3B1;
+            border-radius: 2px;
         }
         
         .dark .results-container::-webkit-scrollbar-thumb {
-            background-color: #fff;
+            background-color: #0FA3B1;
         }
         
         /* Grid lines */
@@ -243,8 +282,9 @@
                             </div>
                         </div>
                         <div class="flex space-x-4 w-full justify-end">
-                            <button id="checkButton" class="btn-accent">
-                                GENERATE
+                            <button id="checkButton" class="btn-accent relative overflow-hidden">
+                                <span>GENERATE</span>
+                                <span class="absolute inset-0 bg-white/20 dark:bg-black/20 opacity-0 transition-opacity duration-200" id="generateEffect"></span>
                             </button>
                         </div>
                     </div>
@@ -738,13 +778,41 @@
         toggleKerning.addEventListener('change', updateStyles);
         stylisticSetSelect.addEventListener('change', updateStyles);
 
-        // Generate pairs and triplets when the button is clicked
-        checkButton.addEventListener('click', generatePairs);
+        // Generate pairs and triplets when the button is clicked with visual feedback
+        checkButton.addEventListener('click', function() {
+            // Show button effect
+            const effect = document.getElementById('generateEffect');
+            effect.classList.add('opacity-100');
+            
+            // Animate the results heading
+            const resultsHeading = document.querySelector('.text-xl.font-bold');
+            resultsHeading.classList.add('text-accent');
+            
+            setTimeout(() => {
+                effect.classList.remove('opacity-100');
+                setTimeout(() => {
+                    resultsHeading.classList.remove('text-accent');
+                }, 300);
+            }, 400);
+            
+            generatePairs();
+        });
 
         // Allow generating pairs by pressing Enter in the input field
         selectedLetterInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
+                // Trigger the same visual effects as clicking the button
+                const effect = document.getElementById('generateEffect');
+                effect.classList.add('opacity-100');
+                
+                // Generate pairs
                 generatePairs();
+                
+                // Scroll to results
+                setTimeout(() => {
+                    document.querySelector('.text-xl.font-bold').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    effect.classList.remove('opacity-100');
+                }, 400);
             }
         });
 
@@ -775,12 +843,19 @@
 
         // Main function to generate pairs and triplets with performance optimizations
         function generatePairs() {
+            console.log("Generating pairs...");
             const selectedLetter = selectedLetterInput.value;
             
             if (!selectedLetter) {
                 alert('Please enter a letter first');
                 return;
             }
+            
+            // Add visual feedback
+            document.querySelector(".text-xl.font-bold").classList.add("text-accent");
+            setTimeout(() => {
+                document.querySelector(".text-xl.font-bold").classList.remove("text-accent");
+            }, 500);
 
             // Get the active character set
             let charSet = latinAlphabet;
@@ -790,6 +865,8 @@
             if (includeNumbers) charSet += numbers;
             if (includePunctuation) charSet += punctuation;
             if (includeSymbols) charSet += symbols;
+            
+            console.log(`Character set size: ${charSet.length} characters`);
 
             // Generate results
             
@@ -869,11 +946,41 @@
             }
             
             // Append all fragments to the DOM (only 5 reflows instead of hundreds)
-            document.getElementById('firstPosResults').appendChild(fragments.firstPos);
-            document.getElementById('secondPosResults').appendChild(fragments.secondPos);
-            document.getElementById('tripletFirstResults').appendChild(fragments.tripletFirst);
-            document.getElementById('tripletMiddleResults').appendChild(fragments.tripletMiddle);
-            document.getElementById('tripletLastResults').appendChild(fragments.tripletLast);
+            const firstPosContainer = document.getElementById('firstPosResults');
+            const secondPosContainer = document.getElementById('secondPosResults');
+            const tripletFirstContainer = document.getElementById('tripletFirstResults');
+            const tripletMiddleContainer = document.getElementById('tripletMiddleResults');
+            const tripletLastContainer = document.getElementById('tripletLastResults');
+            
+            console.log("Result containers:", 
+                firstPosContainer ? "First pos exists" : "First pos MISSING",
+                secondPosContainer ? "Second pos exists" : "Second pos MISSING",
+                tripletFirstContainer ? "Triplet first exists" : "Triplet first MISSING",
+                tripletMiddleContainer ? "Triplet middle exists" : "Triplet middle MISSING",
+                tripletLastContainer ? "Triplet last exists" : "Triplet last MISSING"
+            );
+            
+            // Add debug styles to make containers more visible
+            [firstPosContainer, secondPosContainer, tripletFirstContainer, tripletMiddleContainer, tripletLastContainer].forEach(container => {
+                if (container) {
+                    container.style.minHeight = "60px";
+                    container.style.border = "1px solid #0FA3B1";
+                }
+            });
+            
+            firstPosContainer.appendChild(fragments.firstPos);
+            secondPosContainer.appendChild(fragments.secondPos);
+            tripletFirstContainer.appendChild(fragments.tripletFirst);
+            tripletMiddleContainer.appendChild(fragments.tripletMiddle);
+            tripletLastContainer.appendChild(fragments.tripletLast);
+            
+            console.log("Fragments appended!");
+            
+            const firstPosContent = firstPosContainer.textContent;
+            console.log(`First pos has ${firstPosContent.length} characters of content`);
+            if (firstPosContent.length < 50) {
+                console.log("First position sample:", firstPosContent);
+            }
             
             // Apply styles to all results
             updateStyles();
@@ -992,6 +1099,8 @@
                 document.getElementById('tripletMiddleResults'),
                 document.getElementById('tripletLastResults')
             ];
+            
+            console.log("Applying styles to containers:", resultContainers.map(c => c ? c.id : "missing"));
             
             // Apply styles to all result containers
             resultContainers.forEach(container => {
