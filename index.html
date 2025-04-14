@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerning Pair Checker</title>
-    <meta name="description" content="A web-based tool for type designers and typographers to check kerning pairs in fonts. Test custom fonts with various character sets.">
+    <meta name="description" content="A web-based tool for type designers and typographers to check kerning pairs in fonts.">
     <meta name="author" content="mikeyokei">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,12 +12,12 @@
             theme: {
                 extend: {
                     colors: {
-                        accent: '#8DD3C7', // Pastel teal instead of neon green
+                        accent: '#8DD3C7',
                         dark: '#121212',
                         light: '#FFFFFF'
                     },
                     fontFamily: {
-                        cheltender: ['Cheltender-Regular', 'sans-serif']
+                        cheltender: ['Cheltender-Regular', 'Arial', 'sans-serif']
                     }
                 }
             },
@@ -25,35 +25,39 @@
         }
     </script>
     <style>
+        /* Importing Cheltender-Regular.ttf directly */
         @font-face {
             font-family: 'Cheltender-Regular';
-            src: url('Cheltender-Regular.woff2') format('woff2'),
-                 url('Cheltender-Regular.woff') format('woff'),
-                 url('Cheltender-Regular.ttf') format('truetype');
+            /* Using a placeholder URL - the actual font will be uploaded by the user */
+            src: url('Cheltender-Regular.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
             font-display: swap;
         }
         
-        /* Preload critical fonts */
-        @media screen {
-            :root::before {
-                position: absolute;
-                width: 0;
-                height: 0;
-                overflow: hidden;
-                z-index: -1;
-                content: url('Cheltender-Regular.woff2');
-            }
-        }
-        
         /* Base kerning and stylistic set classes */
-        .kern-display {
-            font-feature-settings: "kern" 1;
-        }
-        .no-kern {
-            font-feature-settings: "kern" 0;
-        }
+        .kern-display { font-feature-settings: "kern" 1; }
+        .no-kern { font-feature-settings: "kern" 0; }
+        
+        /* OpenType feature classes */
+        .liga { font-feature-settings: "liga" 1; }
+        .no-liga { font-feature-settings: "liga" 0; }
+        .dlig { font-feature-settings: "dlig" 1; }
+        .no-dlig { font-feature-settings: "dlig" 0; }
+        .calt { font-feature-settings: "calt" 1; }
+        .no-calt { font-feature-settings: "calt" 0; }
+        .smcp { font-feature-settings: "smcp" 1; }
+        .no-smcp { font-feature-settings: "smcp" 0; }
+        .onum { font-feature-settings: "onum" 1; }
+        .no-onum { font-feature-settings: "onum" 0; }
+        .tnum { font-feature-settings: "tnum" 1; }
+        .no-tnum { font-feature-settings: "tnum" 0; }
+        .pnum { font-feature-settings: "pnum" 1; }
+        .no-pnum { font-feature-settings: "pnum" 0; }
+        .frac { font-feature-settings: "frac" 1; }
+        .no-frac { font-feature-settings: "frac" 0; }
+        .case { font-feature-settings: "case" 1; }
+        .no-case { font-feature-settings: "case" 0; }
         
         /* Stylistic set classes */
         .ss01 { font-feature-settings: "ss01" 1; }
@@ -77,56 +81,112 @@
         .ss19 { font-feature-settings: "ss19" 1; }
         .ss20 { font-feature-settings: "ss20" 1; }
         
-        /* Brutalist styles */
-        body {
-            font-family: 'Cheltender-Regular', sans-serif;
+        /* Base styles - Always use Cheltender for UI */
+        body, input, select, button, .ui-font {
+            font-family: 'Cheltender-Regular', 'Arial', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
         
-        /* Unified button styles */
+        /* Button styles */
         .btn {
             @apply border border-black/80 flex items-center justify-center py-2 px-4 h-10 text-sm
                    dark:border-white/80 hover:border-accent hover:text-accent 
                    dark:hover:border-accent dark:hover:text-accent transition-all duration-200;
         }
         
-        /* Standard button (outlined) */
-        .btn-outline {
-            @apply btn;
+        .btn-outline { @apply btn; }
+        .btn-accent { @apply btn bg-accent text-black border-accent hover:bg-accent/80; }
+        .btn-active { @apply bg-accent text-black border-accent; }
+        
+        /* Generate button improvements */
+        .generate-btn {
+            @apply flex items-center justify-center px-6 py-3 bg-accent text-black font-bold
+                   border-2 border-accent hover:bg-accent/90 transition-all duration-300
+                   focus:outline-none focus:ring-2 focus:ring-accent/50;
+            min-height: 48px;
+            width: 100%;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
         }
         
-        /* Filled button (accent color) */
-        .btn-accent {
-            @apply btn bg-accent text-black border-accent hover:bg-accent/80 hover:text-black dark:hover:text-black;
+        /* Generate button ripple effect */
+        .generate-btn .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            pointer-events: none;
         }
         
-        /* Active state for any button */
-        .btn-active {
-            @apply bg-accent text-black border-accent;
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
         
-        /* Legacy button classes for backward compatibility */
-        .block-button {
-            @apply btn-outline;
+        .generate-btn:active {
+            transform: scale(0.97);
+            transition: transform 0.1s ease-in-out;
         }
         
-        .block-button-active {
-            @apply btn-active;
-        }
-        
-        .action-button {
-            @apply btn-accent;
+        /* Button glow effect on click */
+        .generate-btn-glow {
+            box-shadow: 0 0 12px 2px rgba(141, 211, 199, 0.7);
+            transition: box-shadow 0.4s ease-out;
         }
         
         /* Results container */
         .results-container {
             max-height: 250px;
+            min-height: 60px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #000 #fff;
+            scrollbar-color: #8DD3C7 transparent;
+            width: 100%;
+            position: relative;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.02);
         }
         
+        .results-container:empty::after {
+            content: "Results will appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(141, 211, 199, 0.4);
+            font-style: italic;
+            font-size: 0.9rem;
+            font-family: 'Cheltender-Regular', 'Arial', sans-serif;
+        }
+        
+        .results-container span {
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.2rem 0.4rem;
+            transition: all 0.15s ease;
+        }
+        
+        .results-container span:hover {
+            color: #8DD3C7;
+        }
+        
+        /* Scrollbar styles */
         .results-container::-webkit-scrollbar {
-            width: 2px;
+            width: 4px;
         }
         
         .results-container::-webkit-scrollbar-track {
@@ -134,26 +194,10 @@
         }
         
         .results-container::-webkit-scrollbar-thumb {
-            background-color: #000;
+            background-color: #8DD3C7;
+            border-radius: 2px;
         }
         
-        .dark .results-container::-webkit-scrollbar-thumb {
-            background-color: #fff;
-        }
-        
-        /* Grid lines */
-        .grid-line {
-            height: 1px;
-            width: 100%;
-            @apply bg-black/20 dark:bg-white/20;
-        }
-        
-        .grid-line-vertical {
-            width: 1px;
-            height: 100%;
-            @apply bg-black/20 dark:bg-white/20;
-        }
-
         /* Copy button styles */
         .copy-btn {
             @apply text-black/60 dark:text-white/60 transition-all duration-200;
@@ -162,132 +206,551 @@
         .copy-btn:hover {
             @apply text-accent;
         }
+
+        /* Loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 2px solid #8DD3C7;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        
+        .dark .spinner {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-top-color: #8DD3C7;
+        }
+        
+        /* Error text */
+        .error-text {
+            color: #ff5252;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Character set selector */
+        .character-set-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .set-chip {
+            padding: 4px 8px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .dark .set-chip {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .set-chip:hover {
+            border-color: #8DD3C7;
+        }
+        
+        .set-chip.active {
+            background-color: #8DD3C7;
+            color: #121212;
+            border-color: #8DD3C7;
+        }
+        
+        .set-chip .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+            opacity: 0.7;
+        }
+
+        /* Results animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Kerning toggle */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.1);
+            transition: .4s;
+        }
+
+        .dark .toggle-slider {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #333;
+            transition: .4s;
+        }
+
+        .dark .toggle-slider:before {
+            background-color: #fff;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: rgba(141, 211, 199, 0.3);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+            background-color: #8DD3C7;
+        }
+
+        /* Form elements */
+        input[type="file"]::file-selector-button {
+            border: 1px solid #8DD3C7;
+            background: rgba(141, 211, 199, 0.1);
+            padding: 4px 8px;
+            border-radius: 2px;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 1rem;
+            font-family: 'Cheltender-Regular', 'Arial', sans-serif;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(141, 211, 199, 0.2);
+        }
+        
+        /* Font size slider styling */
+        .slider-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+        
+        .dark .slider {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #8DD3C7;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #8DD3C7;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .slider::-webkit-slider-thumb:hover, 
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .slider-value {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+        
+        /* OpenType features section */
+        .opentype-section {
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .dark .opentype-section {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .opentype-header {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .dark .opentype-header {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .opentype-header:hover {
+            background-color: rgba(141, 211, 199, 0.05);
+        }
+        
+        .opentype-content {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .feature-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .feature-toggle label {
+            cursor: pointer;
+        }
+        
+        .feature-toggle .toggle-switch {
+            width: 32px;
+            height: 16px;
+        }
+        
+        .feature-toggle .toggle-slider:before {
+            height: 12px;
+            width: 12px;
+        }
+        
+        .feature-toggle input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+        
+        /* Theme toggle styles */
+        .theme-toggle {
+            position: relative;
+            width: 54px;
+            height: 28px;
+            display: inline-block;
+        }
+        
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f0f0f0;
+            transition: 0.4s;
+            border-radius: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-slider:before {
+            position: absolute;
+            content: "☀️";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark .theme-slider {
+            background-color: #333;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark .theme-slider:before {
+            content: "🌙";
+            background-color: #121212;
+            transform: translateX(26px);
+        }
+        
+        .theme-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body class="bg-white text-black dark:bg-dark dark:text-white font-cheltender min-h-screen">
+<body class="bg-white text-black dark:bg-dark dark:text-white min-h-screen">
     <!-- Header -->
     <div class="flex items-center justify-between px-6 py-4 border-b border-black/20 dark:border-white/20">
         <div class="flex items-center space-x-6">
-            <div class="text-xl font-bold">OKEI</div>
-            <div>KERNING CHECKER</div>
+            <div class="text-xl font-bold tracking-wide">OKEI</div>
+            <div class="tracking-wide">KERNING CHECKER</div>
         </div>
-        <div class="text-xs opacity-60">FONT: CHELTENDER-REGULAR</div>
+        <div class="flex items-center gap-6">
+            <div class="text-xs opacity-80">FONT: CHELTENDER-REGULAR</div>
+            <label class="theme-label">
+                <span class="theme-toggle">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="theme-slider"></span>
+                </span>
+            </label>
+        </div>
     </div>
     
     <main class="container mx-auto px-4 py-8 max-w-5xl">
-        <!-- Controls Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-1 border border-black/20 dark:border-white/20">
-            <!-- Left panel -->
-            <div class="col-span-5 p-6 border-b md:border-b-0 md:border-r border-black/20 dark:border-white/20">
-                <div class="mb-8">
-                    <div class="flex justify-between items-center mb-2">
-                        <label for="selectedLetter" class="text-xs font-bold tracking-wide">SELECT LETTER</label>
+        <!-- Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Left column -->
+            <div class="col-span-1 md:col-span-5">
+                <div class="border border-black/20 dark:border-white/20 p-6 mb-6">
+                    <div class="text-center mb-6">
+                        <label for="selectedLetter" class="block text-xs font-bold tracking-wide mb-4">ENTER A LETTER TO CHECK</label>
+                        <div class="flex justify-center mb-6">
+                            <input type="text" id="selectedLetter" maxlength="1" class="w-24 h-24 text-center text-5xl border-2 border-black/40 dark:border-white/40 bg-transparent" />
+                        </div>
+                        <div id="letterError" class="error-text text-center mb-4">Enter a letter</div>
+                        <div class="w-full">
+                            <button id="checkButton" class="w-full py-3 px-6 bg-accent text-black font-bold border-2 border-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent/50 min-h-[48px]">
+                                GENERATE PAIRS
+                            </button>
+                            <div id="generateSpinner" class="hidden w-full text-center mt-2 text-xs">GENERATING...</div>
+                        </div>
                     </div>
-                    <div class="flex space-x-4 items-center border border-black/20 dark:border-white/20 p-2">
-                        <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-16 text-center text-3xl border border-black/40 dark:border-white/40 bg-transparent" />
-                <div class="flex space-x-4">
-                    <button id="checkButton" class="btn-accent">
-                        GENERATE
-                    </button>
-                </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-xs font-bold tracking-wide">CHARACTER SETS</label>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 border border-black/20 dark:border-white/20 p-2">
-                        <button id="toggleLatinBtn" class="btn-outline btn-active" disabled>
-                            <span class="flex-grow text-center">LATIN</span>
-                            <span class="inline-block w-2 h-2 bg-accent ml-2"></span>
-                        </button>
-                        <button id="toggleLatinDiacriticsBtn" class="btn-outline">
-                            <span class="flex-grow text-center">DIACRITICS</span>
-                            <span id="diacriticsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="toggleVietnameseBtn" class="btn-outline">
-                            <span class="flex-grow text-center">VIETNAMESE</span>
-                            <span id="vietnameseIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="toggleNumbersBtn" class="btn-outline">
-                            <span class="flex-grow text-center">NUMBERS</span>
-                            <span id="numbersIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="togglePunctuationBtn" class="btn-outline">
-                            <span class="flex-grow text-center">PUNCTUATION</span>
-                            <span id="punctuationIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
-                        <button id="toggleSymbolsBtn" class="btn-outline">
-                            <span class="flex-grow text-center">SYMBOLS</span>
-                            <span id="symbolsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-all duration-200"></span>
-                        </button>
+                    
+                    <div>
+                        <label class="block text-xs font-bold tracking-wide mb-3">CHARACTER SETS</label>
+                        <div class="character-set-selector">
+                            <div class="set-chip active" data-set="latin">
+                                <span>LATIN</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="diacritics">
+                                <span>DIACRITICS</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="central-euro">
+                                <span>CENTRAL EURO</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="vietnamese">
+                                <span>VIETNAMESE</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="numbers">
+                                <span>NUMBERS</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="punctuation">
+                                <span>PUNCTUATION</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="symbols">
+                                <span>SYMBOLS</span>
+                                <span class="indicator"></span>
+                            </div>
+                            <div class="set-chip" data-set="all">
+                                <span>ALL</span>
+                                <span class="indicator"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Right panel -->
-            <div class="col-span-7 p-6">
-                <div class="mb-8">
-                    <div class="flex justify-between items-center mb-2">
-                        <label for="fontUpload" class="text-xs font-bold tracking-wide">UPLOAD FONT</label>
+            <!-- Right column -->
+            <div class="col-span-1 md:col-span-7">
+                <div class="border border-black/20 dark:border-white/20 p-6">
+                    <div class="mb-6">
+                        <label for="fontUpload" class="block text-xs font-bold tracking-wide mb-2">UPLOAD FONT</label>
+                        <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-xs border border-black/40 dark:border-white/40 p-2 bg-transparent" />
                     </div>
-                    <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-xs border border-black/40 dark:border-white/40 p-2 bg-transparent" />
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label for="toggleKerning" class="text-xs font-bold tracking-wide">KERNING</label>
-                        </div>
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleKerning" class="sr-only" checked />
-                            <div class="relative inline-block w-10 h-5 rounded-none bg-black/10 dark:bg-white/10 mr-2">
-                                <div class="dot absolute left-0.5 top-0.5 w-4 h-4 bg-black dark:bg-white transition-all duration-200" id="kerningDot"></div>
+                    
+                    <!-- Basic Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold tracking-wide mb-2">KERNING</label>
+                            <div class="flex items-center">
+                                <label class="toggle-switch mr-2">
+                                    <input type="checkbox" id="toggleKerning" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="text-xs">ENABLE</span>
                             </div>
-                            <span class="text-xs">ENABLE</span>
-                        </label>
+                        </div>
+                        
+                        <div>
+                            <label for="fontSizeSlider" class="block text-xs font-bold tracking-wide mb-2">SIZE</label>
+                            <div class="slider-container">
+                                <input type="range" id="fontSizeSlider" class="slider" min="16" max="48" value="24" step="2">
+                                <div class="slider-value">
+                                    <span>SMALL</span>
+                                    <span id="fontSizeDisplay">24px</span>
+                                    <span>LARGE</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label for="fontSizeSelect" class="text-xs font-bold tracking-wide">SIZE</label>
+                    <!-- OpenType Features -->
+                    <div class="opentype-section">
+                        <div class="opentype-header" id="opentypeHeader">
+                            <span class="text-xs font-bold tracking-wide">OPENTYPE FEATURES</span>
+                            <span class="text-xs" id="opentypeToggleIcon">+</span>
                         </div>
-                        <select id="fontSizeSelect" class="w-full text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent">
-                            <option value="text-xl">SMALL</option>
-                            <option value="text-2xl" selected>MEDIUM</option>
-                            <option value="text-3xl">LARGE</option>
-                            <option value="text-4xl">XL</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label for="stylisticSetSelect" class="text-xs font-bold tracking-wide">OPENTYPE</label>
+                        <div class="opentype-content" id="opentypeContent" style="display: none;">
+                            <!-- Stylistic Sets -->
+                            <div class="feature-toggle">
+                                <label for="stylisticSetSelect" class="text-xs">STYLISTIC SETS</label>
+                                <select id="stylisticSetSelect" class="text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent ml-auto">
+                                    <option value="none">NONE</option>
+                                    <option value="ss01">SS01</option>
+                                    <option value="ss02">SS02</option>
+                                    <option value="ss03">SS03</option>
+                                    <option value="ss04">SS04</option>
+                                    <option value="ss05">SS05</option>
+                                    <option value="ss06">SS06</option>
+                                    <option value="ss07">SS07</option>
+                                    <option value="ss08">SS08</option>
+                                    <option value="ss09">SS09</option>
+                                    <option value="ss10">SS10</option>
+                                    <option value="ss11">SS11</option>
+                                    <option value="ss12">SS12</option>
+                                    <option value="ss13">SS13</option>
+                                    <option value="ss14">SS14</option>
+                                    <option value="ss15">SS15</option>
+                                    <option value="ss16">SS16</option>
+                                    <option value="ss17">SS17</option>
+                                    <option value="ss18">SS18</option>
+                                    <option value="ss19">SS19</option>
+                                    <option value="ss20">SS20</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Standard Ligatures -->
+                            <div class="feature-toggle">
+                                <label for="toggleLiga">STANDARD LIGATURES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleLiga" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Discretionary Ligatures -->
+                            <div class="feature-toggle">
+                                <label for="toggleDlig">DISCRETIONARY LIGATURES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleDlig">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Contextual Alternates -->
+                            <div class="feature-toggle">
+                                <label for="toggleCalt">CONTEXTUAL ALTERNATES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleCalt" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Small Caps -->
+                            <div class="feature-toggle">
+                                <label for="toggleSmcp">SMALL CAPS</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleSmcp">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Old-style Figures -->
+                            <div class="feature-toggle">
+                                <label for="toggleOnum">OLD-STYLE FIGURES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleOnum">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Tabular Figures -->
+                            <div class="feature-toggle">
+                                <label for="toggleTnum">TABULAR FIGURES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleTnum">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Proportional Figures -->
+                            <div class="feature-toggle">
+                                <label for="togglePnum">PROPORTIONAL FIGURES</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="togglePnum">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Fractions -->
+                            <div class="feature-toggle">
+                                <label for="toggleFrac">FRACTIONS</label>
+                                <label class="toggle-switch ml-auto">
+                                    <input type="checkbox" id="toggleFrac">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
-                        <select id="stylisticSetSelect" class="w-full text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent">
-                            <option value="none">NO STYLISTIC SET</option>
-                            <option value="ss01">STYLISTIC SET 1</option>
-                            <option value="ss02">STYLISTIC SET 2</option>
-                            <option value="ss03">STYLISTIC SET 3</option>
-                            <option value="ss04">STYLISTIC SET 4</option>
-                            <option value="ss05">STYLISTIC SET 5</option>
-                            <option value="ss06">STYLISTIC SET 6</option>
-                            <option value="ss07">STYLISTIC SET 7</option>
-                            <option value="ss08">STYLISTIC SET 8</option>
-                            <option value="ss09">STYLISTIC SET 9</option>
-                            <option value="ss10">STYLISTIC SET 10</option>
-                            <option value="ss11">STYLISTIC SET 11</option>
-                            <option value="ss12">STYLISTIC SET 12</option>
-                            <option value="ss13">STYLISTIC SET 13</option>
-                            <option value="ss14">STYLISTIC SET 14</option>
-                            <option value="ss15">STYLISTIC SET 15</option>
-                            <option value="ss16">STYLISTIC SET 16</option>
-                            <option value="ss17">STYLISTIC SET 17</option>
-                            <option value="ss18">STYLISTIC SET 18</option>
-                            <option value="ss19">STYLISTIC SET 19</option>
-                            <option value="ss20">STYLISTIC SET 20</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -295,98 +758,88 @@
         
         <!-- Results Section -->
         <div class="mt-12 mb-6">
-            <div class="flex items-center justify-between">
-                <div class="text-xl font-bold">RESULTS</div>
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-xl font-bold tracking-wider">RESULTS</div>
                 <div>
                     <button id="copyAllButton" class="btn-outline">COPY ALL</button>
                 </div>
             </div>
             
-            <div class="grid-line my-4"></div>
-            
-            <!-- Pairs Section -->
-            <div class="mb-12">
+            <div class="border-t border-black/20 dark:border-white/20 mb-8 pt-8">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold">LETTER PAIRS</h3>
-                    <div class="text-xs opacity-60">A</div>
+                    <h3 class="text-sm font-bold tracking-wide">LETTER PAIRS</h3>
                 </div>
                 
                 <!-- First position pairs -->
-                <div class="border border-black/20 dark:border-white/20 mb-6">
+                <div class="border border-black/20 dark:border-white/20 mb-6 hover:border-black/30 dark:hover:border-white/30 transition-colors duration-200">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5">
                         <div class="flex items-center">
-                            <span class="text-xs font-bold mr-2">A.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
                         <button class="copy-btn text-xs" data-target="firstPosResults">
                             COPY
                         </button>
                     </div>
-                    <div id="firstPosResults" class="p-6 text-2xl results-container"></div>
+                    <div id="firstPosResults" class="p-6 results-container result-font"></div>
                 </div>
                 
                 <!-- Second position pairs -->
-                <div class="border border-black/20 dark:border-white/20">
+                <div class="border border-black/20 dark:border-white/20 hover:border-black/30 dark:hover:border-white/30 transition-colors duration-200">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5">
                         <div class="flex items-center">
-                            <span class="text-xs font-bold mr-2">A.2</span>
                             <span class="text-xs">SECOND POSITION</span>
                         </div>
                         <button class="copy-btn text-xs" data-target="secondPosResults">
                             COPY
                         </button>
                     </div>
-                    <div id="secondPosResults" class="p-6 text-2xl results-container"></div>
+                    <div id="secondPosResults" class="p-6 results-container result-font"></div>
                 </div>
             </div>
             
             <!-- Triplets Section -->
-            <div>
+            <div class="border-t border-black/20 dark:border-white/20 pt-8">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold">LETTER TRIPLETS</h3>
-                    <div class="text-xs opacity-60">B</div>
+                    <h3 class="text-sm font-bold tracking-wide">LETTER TRIPLETS</h3>
                 </div>
                 
                 <!-- First position triplets -->
-                <div class="border border-black/20 dark:border-white/20 mb-6">
+                <div class="border border-black/20 dark:border-white/20 mb-6 hover:border-black/30 dark:hover:border-white/30 transition-colors duration-200">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5">
                         <div class="flex items-center">
-                            <span class="text-xs font-bold mr-2">B.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
                         <button class="copy-btn text-xs" data-target="tripletFirstResults">
                             COPY
                         </button>
                     </div>
-                    <div id="tripletFirstResults" class="p-6 text-2xl results-container"></div>
+                    <div id="tripletFirstResults" class="p-6 results-container result-font"></div>
                 </div>
                 
                 <!-- Middle position triplets -->
-                <div class="border border-black/20 dark:border-white/20 mb-6">
+                <div class="border border-black/20 dark:border-white/20 mb-6 hover:border-black/30 dark:hover:border-white/30 transition-colors duration-200">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5">
                         <div class="flex items-center">
-                            <span class="text-xs font-bold mr-2">B.2</span>
                             <span class="text-xs">MIDDLE POSITION</span>
                         </div>
                         <button class="copy-btn text-xs" data-target="tripletMiddleResults">
                             COPY
                         </button>
                     </div>
-                    <div id="tripletMiddleResults" class="p-6 text-2xl results-container"></div>
+                    <div id="tripletMiddleResults" class="p-6 results-container result-font"></div>
                 </div>
                 
                 <!-- Last position triplets -->
-                <div class="border border-black/20 dark:border-white/20">
+                <div class="border border-black/20 dark:border-white/20 hover:border-black/30 dark:hover:border-white/30 transition-colors duration-200">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5">
                         <div class="flex items-center">
-                            <span class="text-xs font-bold mr-2">B.3</span>
                             <span class="text-xs">LAST POSITION</span>
                         </div>
                         <button class="copy-btn text-xs" data-target="tripletLastResults">
                             COPY
                         </button>
                     </div>
-                    <div id="tripletLastResults" class="p-6 text-2xl results-container"></div>
+                    <div id="tripletLastResults" class="p-6 results-container result-font"></div>
                 </div>
             </div>
         </div>
@@ -405,71 +858,201 @@
     </footer>
 
     <script>
-        // Character sets
-        const latinAlphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const latinDiacritics = 'àáâäæãåāèéêëēėęîïíīįìôöòóœøōõûüùúūÿÀÁÂÄÆÃÅĀÈÉÊËĒĖĘÎÏÍĪĮÌÔÖÒÓŒØŌÕÛÜÙÚŪŸçÇñÑßðÐþÞ';
-        const vietnameseChars = 'ăâđêôơưĂÂĐÊÔƠƯáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ';
-        const numbers = '0123456789';
-        const punctuation = '.,;:!?\'"\\/()[]{}<>@#$%^&*_-+=|~`';
-        const symbols = '€£¥₹₽¢¤§©®™°′″‰¶†‡•…‱⁂⁋⁎⁑⁠⁰⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎';
-
+        // Character sets - Complete collections for various scripts and languages
+        const charSets = {
+            latin: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            diacritics: 'àáâäæãåāèéêëēėęěîïíīįìôöòóœøōõûüùúūÿÀÁÂÄÆÃÅĀÈÉÊËĒĖĘĚÎÏÍĪĮÌÔÖÒÓŒØŌÕÛÜÙÚŪŸçÇñÑßðÐþÞğıİöüĞÖÜāēīōūĀĒĪŌŪåæøÅÆØðþÐÞħĦĸĶĺĹľĽŀĿłŁ',
+            'central-euro': 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻčďěňřšťžČĎĚŇŘŠŤŽăâîșțĂÂÎȘȚ',
+            vietnamese: 'ăâđêôơưĂÂĐÊÔƠƯáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ',
+            numbers: '0123456789',
+            punctuation: '.,;:!?\'"\\/()[]{}<>@#$%^&*_-+=|~`',
+            symbols: '€£¥₹₽¢¤§©®™°'
+        };
+        
         // DOM Elements
         const selectedLetterInput = document.getElementById('selectedLetter');
+        const letterError = document.getElementById('letterError');
         const checkButton = document.getElementById('checkButton');
-        const toggleVietnameseBtn = document.getElementById('toggleVietnameseBtn');
-        const toggleNumbersBtn = document.getElementById('toggleNumbersBtn');
-        const togglePunctuationBtn = document.getElementById('togglePunctuationBtn');
-        const toggleLatinBtn = document.getElementById('toggleLatinBtn');
-        const toggleLatinDiacriticsBtn = document.getElementById('toggleLatinDiacriticsBtn');
-        const toggleSymbolsBtn = document.getElementById('toggleSymbolsBtn');
+        const generateSpinner = document.getElementById('generateSpinner');
         const fontUpload = document.getElementById('fontUpload');
-        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
         const toggleKerning = document.getElementById('toggleKerning');
-        const kerningDot = document.getElementById('kerningDot');
         const stylisticSetSelect = document.getElementById('stylisticSetSelect');
         const copyAllButton = document.getElementById('copyAllButton');
+        const setChips = document.querySelectorAll('.set-chip');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // OpenType feature toggles
+        const toggleLiga = document.getElementById('toggleLiga');
+        const toggleDlig = document.getElementById('toggleDlig');
+        const toggleCalt = document.getElementById('toggleCalt');
+        const toggleSmcp = document.getElementById('toggleSmcp');
+        const toggleOnum = document.getElementById('toggleOnum');
+        const toggleTnum = document.getElementById('toggleTnum');
+        const togglePnum = document.getElementById('togglePnum');
+        const toggleFrac = document.getElementById('toggleFrac');
+        
+        // OpenType features panel toggle
+        const opentypeHeader = document.getElementById('opentypeHeader');
+        const opentypeContent = document.getElementById('opentypeContent');
+        const opentypeToggleIcon = document.getElementById('opentypeToggleIcon');
+
+        // Result containers
+        const firstPosResults = document.getElementById('firstPosResults');
+        const secondPosResults = document.getElementById('secondPosResults');
+        const tripletFirstResults = document.getElementById('tripletFirstResults');
+        const tripletMiddleResults = document.getElementById('tripletMiddleResults');
+        const tripletLastResults = document.getElementById('tripletLastResults');
+        const resultContainers = document.querySelectorAll('.result-font');
 
         // State
-        let includeVietnamese = false;
-        let includeNumbers = false;
-        let includePunctuation = false;
-        let includeLatinDiacritics = false;
-        let includeSymbols = false;
-        let includeLatin = true; // Always true
-        let customFontName = 'Cheltender-Regular'; // Default font name
-
-        // Dark mode detection
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
+        let uiFontName = 'Cheltender-Regular'; // UI font always stays Cheltender
+        let resultFontName = 'Cheltender-Regular'; // Result font changes with upload
+        let isGenerating = false; // Track generation state
+        let activeCharSets = {
+            latin: true,
+            diacritics: false,
+            'central-euro': false,
+            vietnamese: false,
+            numbers: false,
+            punctuation: false,
+            symbols: false,
+            all: false
+        };
+        
+        // Theme Management
+        function initializeTheme() {
+            // Use system preference for initial state
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+                themeToggle.checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggle.checked = false;
+            }
         }
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
+        
+        // Toggle theme
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
         });
-
-        // Update toggle switch appearance
-        toggleKerning.addEventListener('change', function() {
-            if (this.checked) {
-                kerningDot.style.transform = 'translateX(20px)';
-                kerningDot.classList.add('bg-accent');
-                kerningDot.classList.remove('bg-black', 'dark:bg-white');
-            } else {
-                kerningDot.style.transform = 'translateX(0)';
-                kerningDot.classList.remove('bg-accent');
-                kerningDot.classList.add('bg-black', 'dark:bg-white');
-            }
-            updateStyles();
+        
+        // Initialize theme on page load
+        initializeTheme();
+        
+        // System preference change listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            // Keep the manual toggle independent of system preferences
+            // Don't automatically change if user has manually toggled
         });
         
-        // Initialize toggle switch appearance
-        if (toggleKerning.checked) {
-            kerningDot.style.transform = 'translateX(20px)';
-            kerningDot.classList.add('bg-accent');
-            kerningDot.classList.remove('bg-black', 'dark:bg-white');
+        // Toggle OpenType panel
+        opentypeHeader.addEventListener('click', function() {
+            if (opentypeContent.style.display === 'none') {
+                opentypeContent.style.display = 'grid';
+                opentypeToggleIcon.textContent = '-';
+            } else {
+                opentypeContent.style.display = 'none';
+                opentypeToggleIcon.textContent = '+';
+            }
+        });
+
+        // Apply fonts properly - UI stays as Cheltender, results change
+        function applyFonts() {
+            // Apply UI font to everything
+            document.body.style.fontFamily = `'${uiFontName}', 'Arial', sans-serif`;
+            
+            // Apply result font only to result containers
+            resultContainers.forEach(container => {
+                container.style.fontFamily = `'${resultFontName}', 'Arial', sans-serif`;
+            });
         }
+        
+        // Initialize fonts
+        applyFonts();
+
+        // Font size slider
+        fontSizeSlider.addEventListener('input', function() {
+            const size = parseInt(this.value);
+            fontSizeDisplay.textContent = `${size}px`;
+            
+            // Apply size to all result containers
+            resultContainers.forEach(container => {
+                container.style.fontSize = `${size}px`;
+            });
+        });
+        
+        // Set initial font size
+        fontSizeDisplay.textContent = `${fontSizeSlider.value}px`;
+        resultContainers.forEach(container => {
+            container.style.fontSize = `${fontSizeSlider.value}px`;
+        });
+
+        // Character set selection
+        setChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const setName = chip.dataset.set;
+                
+                if (setName === 'all') {
+                    // Toggle all sets
+                    const allActive = !activeCharSets.all;
+                    activeCharSets.all = allActive;
+                    
+                    // Update all other sets
+                    Object.keys(activeCharSets).forEach(key => {
+                        if (key !== 'all') {
+                            activeCharSets[key] = allActive;
+                        }
+                    });
+                    
+                    // Update UI
+                    setChips.forEach(c => {
+                        if (allActive) {
+                            c.classList.add('active');
+                        } else {
+                            if (c.dataset.set === 'latin') {
+                                c.classList.add('active');  // Latin is always active
+                                activeCharSets.latin = true;
+                            } else {
+                                c.classList.remove('active');
+                            }
+                        }
+                    });
+                } else {
+                    // Toggle individual set
+                    if (setName === 'latin') {
+                        // Latin is always active
+                        return;
+                    }
+                    
+                    activeCharSets[setName] = !activeCharSets[setName];
+                    
+                    if (activeCharSets[setName]) {
+                        chip.classList.add('active');
+                    } else {
+                        chip.classList.remove('active');
+                    }
+                    
+                    // Check if all are active/inactive
+                    const allActive = Object.keys(activeCharSets).every(key => 
+                        key === 'all' || activeCharSets[key]
+                    );
+                    
+                    activeCharSets.all = allActive;
+                    const allChip = document.querySelector('.set-chip[data-set="all"]');
+                    if (allActive) {
+                        allChip.classList.add('active');
+                    } else {
+                        allChip.classList.remove('active');
+                    }
+                }
+            });
+        });
 
         // Font upload handling
         fontUpload.addEventListener('change', function(e) {
@@ -477,10 +1060,15 @@
                 const file = this.files[0];
                 const reader = new FileReader();
                 
+                // Show loading indicator
+                const uploadLabel = document.querySelector('label[for="fontUpload"]');
+                const originalText = uploadLabel.textContent;
+                uploadLabel.textContent = 'LOADING FONT...';
+                
                 reader.onload = function(e) {
                     const fontData = e.target.result;
                     const fontName = file.name.split('.')[0];
-                    customFontName = fontName;
+                    resultFontName = fontName; // Only update result font name
                     
                     // Create a new @font-face rule for the uploaded font
                     const fontFace = `
@@ -489,6 +1077,7 @@
                             src: url('${fontData}') format('${getFormat(file.name)}');
                             font-weight: normal;
                             font-style: normal;
+                            font-display: swap;
                         }
                     `;
                     
@@ -497,11 +1086,22 @@
                     style.textContent = fontFace;
                     document.head.appendChild(style);
                     
-                    // Update all text with the new font
+                    // Update result font without changing UI font
+                    applyFonts();
                     updateStyles();
                     
-                    // Update the font name in the header
+                    // Update the font name in the header (but keep UI font as Cheltender)
                     document.querySelector('header .text-xs').textContent = `FONT: ${fontName.toUpperCase()}`;
+                    
+                    // Restore label text
+                    uploadLabel.textContent = originalText;
+                    
+                    // Add visual feedback
+                    const fontHeader = document.querySelector('header .text-xs');
+                    fontHeader.classList.add('text-accent');
+                    setTimeout(() => {
+                        fontHeader.classList.remove('text-accent');
+                    }, 1000);
                 };
                 
                 reader.readAsDataURL(file);
@@ -520,178 +1120,210 @@
             }
         }
 
-        // Toggle button style helper
-        function updateButtonStyle(button, isActive) {
-            // Get the corresponding indicator
-            let indicatorId;
-            if (button.id === 'toggleLatinDiacriticsBtn') indicatorId = 'diacriticsIndicator';
-            else if (button.id === 'toggleVietnameseBtn') indicatorId = 'vietnameseIndicator';
-            else if (button.id === 'toggleNumbersBtn') indicatorId = 'numbersIndicator';
-            else if (button.id === 'togglePunctuationBtn') indicatorId = 'punctuationIndicator';
-            else if (button.id === 'toggleSymbolsBtn') indicatorId = 'symbolsIndicator';
-            
-            const indicator = indicatorId ? document.getElementById(indicatorId) : null;
-            
-            if (isActive) {
-                button.classList.add('btn-active');
-                if (indicator) indicator.classList.remove('opacity-0');
-            } else {
-                button.classList.remove('btn-active');
-                if (indicator) indicator.classList.add('opacity-0');
-            }
-        }
-
-        // Toggle button event listeners
-        toggleVietnameseBtn.addEventListener('click', () => {
-            includeVietnamese = !includeVietnamese;
-            updateButtonStyle(toggleVietnameseBtn, includeVietnamese);
-            generatePairs();
-        });
-
-        toggleNumbersBtn.addEventListener('click', () => {
-            includeNumbers = !includeNumbers;
-            updateButtonStyle(toggleNumbersBtn, includeNumbers);
-            generatePairs();
-        });
-
-        togglePunctuationBtn.addEventListener('click', () => {
-            includePunctuation = !includePunctuation;
-            updateButtonStyle(togglePunctuationBtn, includePunctuation);
-            generatePairs();
-        });
+        // OpenType feature toggles and dropdowns
+        toggleLiga.addEventListener('change', updateStyles);
+        toggleDlig.addEventListener('change', updateStyles);
+        toggleCalt.addEventListener('change', updateStyles);
+        toggleSmcp.addEventListener('change', updateStyles);
+        toggleOnum.addEventListener('change', updateStyles);
+        toggleTnum.addEventListener('change', updateStyles);
+        togglePnum.addEventListener('change', updateStyles);
+        toggleFrac.addEventListener('change', updateStyles);
         
-        toggleLatinDiacriticsBtn.addEventListener('click', () => {
-            includeLatinDiacritics = !includeLatinDiacritics;
-            updateButtonStyle(toggleLatinDiacriticsBtn, includeLatinDiacritics);
-            generatePairs();
-        });
-        
-        toggleSymbolsBtn.addEventListener('click', () => {
-            includeSymbols = !includeSymbols;
-            updateButtonStyle(toggleSymbolsBtn, includeSymbols);
-            generatePairs();
-        });
-
-        // Font size, kerning, and stylistic set change listeners
-        fontSizeSelect.addEventListener('change', updateStyles);
+        // Kerning and stylistic set change listeners
         toggleKerning.addEventListener('change', updateStyles);
         stylisticSetSelect.addEventListener('change', updateStyles);
 
         // Generate pairs and triplets when the button is clicked
-        checkButton.addEventListener('click', generatePairs);
+        checkButton.addEventListener('click', function(e) {
+            if (isGenerating) return;
+            
+            // Simply generate pairs without any animations
+            generatePairs();
+        });
+
+        // Focus on the letter input on page load
+        selectedLetterInput.focus();
 
         // Allow generating pairs by pressing Enter in the input field
         selectedLetterInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !isGenerating) {
                 generatePairs();
             }
         });
 
-        // Set initial focus
-        selectedLetterInput.focus();
+        // Reset error state when typing
+        selectedLetterInput.addEventListener('input', () => {
+            letterError.style.display = 'none';
+            selectedLetterInput.classList.remove('border-red-500');
+        });
 
-        // Main function to generate pairs and triplets with performance optimizations
+        // Helper to show loading state
+        function setGeneratingState(isLoading) {
+            isGenerating = isLoading;
+            
+            if (isLoading) {
+                generateSpinner.classList.remove('hidden');
+                checkButton.disabled = true;
+                checkButton.textContent = 'GENERATING...';
+            } else {
+                generateSpinner.classList.add('hidden');
+                checkButton.disabled = false;
+                checkButton.textContent = 'GENERATE PAIRS';
+            }
+        }
+
+        // Get the combined character set based on selected options
+        function getActiveCharacterSet() {
+            let combinedSet = '';
+            
+            if (activeCharSets.latin) combinedSet += charSets.latin;
+            if (activeCharSets.diacritics) combinedSet += charSets.diacritics;
+            if (activeCharSets['central-euro']) combinedSet += charSets['central-euro'];
+            if (activeCharSets.vietnamese) combinedSet += charSets.vietnamese;
+            if (activeCharSets.numbers) combinedSet += charSets.numbers;
+            if (activeCharSets.punctuation) combinedSet += charSets.punctuation;
+            if (activeCharSets.symbols) combinedSet += charSets.symbols;
+            
+            return combinedSet;
+        }
+
+        // Main function to generate pairs and triplets
         function generatePairs() {
             const selectedLetter = selectedLetterInput.value;
             
             if (!selectedLetter) {
-                alert('Please enter a letter first');
+                letterError.style.display = 'block';
+                selectedLetterInput.classList.add('border-red-500');
+                selectedLetterInput.focus();
                 return;
             }
-
-            // Get the active character set
-            let charSet = latinAlphabet;
-            if (includeLatinDiacritics) charSet += latinDiacritics;
-            if (includeVietnamese) charSet += vietnameseChars;
-            if (includeNumbers) charSet += numbers;
-            if (includePunctuation) charSet += punctuation;
-            if (includeSymbols) charSet += symbols;
-
-            // Generate results
             
-            // Use DocumentFragment for better performance
-            const resultIds = [
-                'firstPosResults', 
-                'secondPosResults', 
-                'tripletFirstResults', 
-                'tripletMiddleResults', 
-                'tripletLastResults'
-            ];
+            setGeneratingState(true);
             
-            // Clear all results at once
-            resultIds.forEach(id => {
-                document.getElementById(id).innerHTML = '';
-            });
+            // Get character set based on active options
+            let charSet = getActiveCharacterSet();
             
-            // Create fragments for better performance
-            const fragments = {
-                firstPos: document.createDocumentFragment(),
-                secondPos: document.createDocumentFragment(),
-                tripletFirst: document.createDocumentFragment(),
-                tripletMiddle: document.createDocumentFragment(),
-                tripletLast: document.createDocumentFragment()
-            };
+            // Clear results
+            firstPosResults.innerHTML = '';
+            secondPosResults.innerHTML = '';
+            tripletFirstResults.innerHTML = '';
+            tripletMiddleResults.innerHTML = '';
+            tripletLastResults.innerHTML = '';
             
-            // Generate pairs (much faster with a single loop)
-            const charSetArray = [...charSet];
-            const charSetLength = charSetArray.length;
-            
-            // First create all spans in a single pass
-            for (let i = 0; i < charSetLength; i++) {
-                const char = charSetArray[i];
-                
-                // Pairs
-                const firstPosSpan = document.createElement('span');
-                firstPosSpan.textContent = selectedLetter + char + ' ';
-                fragments.firstPos.appendChild(firstPosSpan);
-                
-                const secondPosSpan = document.createElement('span');
-                secondPosSpan.textContent = char + selectedLetter + ' ';
-                fragments.secondPos.appendChild(secondPosSpan);
-                
-                // Only generate triplets at specified intervals (every 5th character)
-                if (i % 5 === 0) {
-                    for (let j = 0; j < charSetLength; j += 5) {
-                        const char2 = charSetArray[j];
-                        
-                        // Triplets
-                        const tripletFirstSpan = document.createElement('span');
-                        tripletFirstSpan.textContent = selectedLetter + char + char2 + ' ';
-                        fragments.tripletFirst.appendChild(tripletFirstSpan);
-                        
-                        const tripletMiddleSpan = document.createElement('span');
-                        tripletMiddleSpan.textContent = char + selectedLetter + char2 + ' ';
-                        fragments.tripletMiddle.appendChild(tripletMiddleSpan);
-                        
-                        const tripletLastSpan = document.createElement('span');
-                        tripletLastSpan.textContent = char + char2 + selectedLetter + ' ';
-                        fragments.tripletLast.appendChild(tripletLastSpan);
-                    }
-                }
+            // Limit character set size for performance
+            const maxChars = 300;
+            if (charSet.length > maxChars) {
+                charSet = charSet.substring(0, maxChars);
             }
             
-            // Append all fragments to the DOM (only 5 reflows instead of hundreds)
-            document.getElementById('firstPosResults').appendChild(fragments.firstPos);
-            document.getElementById('secondPosResults').appendChild(fragments.secondPos);
-            document.getElementById('tripletFirstResults').appendChild(fragments.tripletFirst);
-            document.getElementById('tripletMiddleResults').appendChild(fragments.tripletMiddle);
-            document.getElementById('tripletLastResults').appendChild(fragments.tripletLast);
-            
-            // Apply styles to all results
-            updateStyles();
+            setTimeout(() => {
+                try {
+                    // Process the character set
+                    const charSetArray = [...new Set([...charSet])]; // Remove duplicates
+                    const charSetLength = charSetArray.length;
+                    
+                    // Create fragments
+                    const firstPosFragment = document.createDocumentFragment();
+                    const secondPosFragment = document.createDocumentFragment();
+                    const tripletFirstFragment = document.createDocumentFragment();
+                    const tripletMiddleFragment = document.createDocumentFragment();
+                    const tripletLastFragment = document.createDocumentFragment();
+                    
+                    // Process in chunks
+                    const chunkSize = 50;
+                    let processedChars = 0;
+                    let tripletSampleRate = charSetLength > 200 ? 10 : (charSetLength > 100 ? 6 : 3);
+                    
+                    function processNextChunk() {
+                        if (processedChars >= charSetLength) {
+                            // All chunks processed, append fragments
+                            firstPosResults.appendChild(firstPosFragment);
+                            secondPosResults.appendChild(secondPosFragment);
+                            tripletFirstResults.appendChild(tripletFirstFragment);
+                            tripletMiddleResults.appendChild(tripletMiddleFragment);
+                            tripletLastResults.appendChild(tripletLastFragment);
+                            
+                            // Add fade-in animation
+                            [firstPosResults, secondPosResults, tripletFirstResults, 
+                             tripletMiddleResults, tripletLastResults].forEach(container => {
+                                container.classList.add('results-fade-in');
+                            });
+                            
+                            updateStyles();
+                            setGeneratingState(false);
+                            
+                            // Remove animation class after fade in
+                            setTimeout(() => {
+                                [firstPosResults, secondPosResults, tripletFirstResults, 
+                                 tripletMiddleResults, tripletLastResults].forEach(container => {
+                                    container.classList.remove('results-fade-in');
+                                });
+                            }, 1000);
+                            
+                            return;
+                        }
+                        
+                        const endIndex = Math.min(processedChars + chunkSize, charSetLength);
+                        
+                        // Process this chunk
+                        for (let i = processedChars; i < endIndex; i++) {
+                            const char = charSetArray[i];
+                            
+                            // Pairs
+                            const firstPosSpan = document.createElement('span');
+                            firstPosSpan.textContent = selectedLetter + char + ' ';
+                            firstPosFragment.appendChild(firstPosSpan);
+                            
+                            const secondPosSpan = document.createElement('span');
+                            secondPosSpan.textContent = char + selectedLetter + ' ';
+                            secondPosFragment.appendChild(secondPosSpan);
+                            
+                            // Only generate triplets at specified intervals
+                            const sampleRate = 3;
+                            
+                            if (i % sampleRate === 0) {
+                                for (let j = 0; j < charSetLength; j += tripletSampleRate) {
+                                    const char2 = charSetArray[j];
+                                    
+                                    // Triplets
+                                    const tripletFirstSpan = document.createElement('span');
+                                    tripletFirstSpan.textContent = selectedLetter + char + char2 + ' ';
+                                    tripletFirstFragment.appendChild(tripletFirstSpan);
+                                    
+                                    const tripletMiddleSpan = document.createElement('span');
+                                    tripletMiddleSpan.textContent = char + selectedLetter + char2 + ' ';
+                                    tripletMiddleFragment.appendChild(tripletMiddleSpan);
+                                    
+                                    const tripletLastSpan = document.createElement('span');
+                                    tripletLastSpan.textContent = char + char2 + selectedLetter + ' ';
+                                    tripletLastFragment.appendChild(tripletLastSpan);
+                                }
+                            }
+                        }
+                        
+                        processedChars = endIndex;
+                        setTimeout(processNextChunk, 0);
+                    }
+                    
+                    processNextChunk();
+                    
+                } catch (error) {
+                    console.error("Error generating pairs:", error);
+                    setGeneratingState(false);
+                }
+            }, 50);
         }
 
-        // Copy button functionality for individual sections using modern Clipboard API
+        // Copy functionality for individual sections
         document.querySelectorAll('.copy-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const targetId = button.getAttribute('data-target');
                 const targetElement = document.getElementById(targetId);
                 
                 try {
-                    // Use modern Clipboard API
                     await navigator.clipboard.writeText(targetElement.textContent);
                     
-                    // Visual feedback
                     const originalText = button.textContent.trim();
                     button.textContent = 'COPIED';
                     button.classList.remove('opacity-60');
@@ -700,7 +1332,7 @@
                         button.classList.add('opacity-60');
                     }, 2000);
                 } catch (err) {
-                    // Fallback to old method if Clipboard API fails
+                    // Fallback method
                     const textarea = document.createElement('textarea');
                     textarea.value = targetElement.textContent;
                     document.body.appendChild(textarea);
@@ -708,7 +1340,6 @@
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
                     
-                    // Visual feedback
                     const originalText = button.textContent.trim();
                     button.textContent = 'COPIED';
                     button.classList.remove('opacity-60');
@@ -720,9 +1351,8 @@
             });
         });
         
-        // Visual feedback on copy actions using modern Clipboard API
+        // Copy all
         copyAllButton.addEventListener('click', async () => {
-            // Collect all text content
             const resultIds = [
                 'firstPosResults', 
                 'secondPosResults', 
@@ -733,7 +1363,6 @@
             
             const allSections = resultIds.map(id => document.getElementById(id));
             
-            // Create headings and content
             const sections = [
                 "--- LETTER PAIRS (FIRST POSITION) ---\n",
                 allSections[0].textContent,
@@ -748,10 +1377,8 @@
             ];
             
             try {
-                // Use modern Clipboard API
                 await navigator.clipboard.writeText(sections.join(''));
                 
-                // Visual feedback
                 const originalContent = copyAllButton.textContent;
                 copyAllButton.textContent = 'ALL COPIED';
                 copyAllButton.classList.add('btn-active');
@@ -760,7 +1387,7 @@
                     copyAllButton.classList.remove('btn-active');
                 }, 2000);
             } catch (err) {
-                // Fallback to old method if Clipboard API fails
+                // Fallback method
                 const textarea = document.createElement('textarea');
                 textarea.value = sections.join('');
                 document.body.appendChild(textarea);
@@ -768,7 +1395,6 @@
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
                 
-                // Visual feedback
                 const originalContent = copyAllButton.textContent;
                 copyAllButton.textContent = 'ALL COPIED';
                 copyAllButton.classList.add('btn-active');
@@ -779,60 +1405,56 @@
             }
         });
 
-
-        // Update font styles, kerning, and stylistic sets
+        // Update styles (kerning, stylistic sets, and OpenType features)
         function updateStyles() {
             const isKerningEnabled = toggleKerning.checked;
-            const fontSize = fontSizeSelect.value;
             const selectedStylisticSet = stylisticSetSelect.value;
             
-            // Get all result containers
-            const resultContainers = [
-                document.getElementById('firstPosResults'),
-                document.getElementById('secondPosResults'),
-                document.getElementById('tripletFirstResults'),
-                document.getElementById('tripletMiddleResults'),
-                document.getElementById('tripletLastResults')
-            ];
+            // Get OpenType feature states
+            const ligaEnabled = toggleLiga.checked;
+            const dligEnabled = toggleDlig.checked;
+            const caltEnabled = toggleCalt.checked;
+            const smcpEnabled = toggleSmcp.checked;
+            const onumEnabled = toggleOnum.checked;
+            const tnumEnabled = toggleTnum.checked;
+            const pnumEnabled = togglePnum.checked;
+            const fracEnabled = toggleFrac.checked;
             
-            // Apply styles to all result containers
+            // Apply to result containers only
             resultContainers.forEach(container => {
-                // Apply font size
-                container.classList.remove('text-xl', 'text-2xl', 'text-3xl', 'text-4xl');
-                container.classList.add(fontSize);
+                if (!container) return;
                 
-                // Apply custom font
-                container.style.fontFamily = `'${customFontName}', sans-serif`;
+                // Build font-feature-settings string
+                let featureSettings = [];
                 
-                // First, remove all stylistic set classes
-                for (let i = 1; i <= 20; i++) {
-                    const ssClass = `ss${i.toString().padStart(2, '0')}`;
-                    container.classList.remove(ssClass);
-                }
-                
-                // Clear any existing font-feature-settings
-                container.style.fontFeatureSettings = '';
-                
-                // Apply kerning and stylistic sets using inline style for proper combination
-                if (selectedStylisticSet !== 'none' && isKerningEnabled) {
-                    // Both kerning and stylistic set
-                    container.style.fontFeatureSettings = `"kern" 1, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (selectedStylisticSet !== 'none') {
-                    // Only stylistic set, no kerning
-                    container.style.fontFeatureSettings = `"kern" 0, "${selectedStylisticSet}" 1`;
-                    container.classList.remove('kern-display', 'no-kern');
-                } else if (isKerningEnabled) {
-                    // Only kerning, no stylistic set
-                    container.classList.add('kern-display');
-                    container.classList.remove('no-kern');
-                    container.style.fontFeatureSettings = '';
+                // Add kerning
+                if (isKerningEnabled) {
+                    featureSettings.push('"kern" 1');
                 } else {
-                    // Neither kerning nor stylistic set
-                    container.classList.add('no-kern');
-                    container.classList.remove('kern-display');
-                    container.style.fontFeatureSettings = '';
+                    featureSettings.push('"kern" 0');
                 }
+                
+                // Add stylistic set if selected
+                if (selectedStylisticSet !== 'none') {
+                    featureSettings.push(`"${selectedStylisticSet}" 1`);
+                }
+                
+                // Add other OpenType features
+                if (ligaEnabled) featureSettings.push('"liga" 1');
+                else featureSettings.push('"liga" 0');
+                
+                if (dligEnabled) featureSettings.push('"dlig" 1');
+                if (caltEnabled) featureSettings.push('"calt" 1');
+                else featureSettings.push('"calt" 0');
+                
+                if (smcpEnabled) featureSettings.push('"smcp" 1');
+                if (onumEnabled) featureSettings.push('"onum" 1');
+                if (tnumEnabled) featureSettings.push('"tnum" 1');
+                if (pnumEnabled) featureSettings.push('"pnum" 1');
+                if (fracEnabled) featureSettings.push('"frac" 1');
+                
+                // Apply all features
+                container.style.fontFeatureSettings = featureSettings.join(', ');
             });
         }
         
