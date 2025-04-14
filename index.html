@@ -78,10 +78,10 @@
         .block-button-active {
             @apply bg-accent text-black border-accent;
         }
-        
-        /* Action button */
+
+        /* Action button - made consistent with block buttons */
         .action-button {
-            @apply bg-accent text-black px-5 py-2 inline-block font-bold transition-colors duration-200;
+            @apply border border-black bg-accent text-black px-4 py-2 h-10 inline-flex items-center justify-center text-sm font-bold transition-colors duration-200;
         }
         
         /* Results container */
@@ -131,7 +131,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between px-6 py-4 border-b border-black/20 dark:border-white/20">
         <div class="flex items-center space-x-6">
-            <div class="text-xl font-bold">A/01</div>
+            <div class="text-xl font-bold">OKEI</div>
             <div>KERNING CHECKER</div>
         </div>
         <div class="text-xs opacity-60">FONT: CHELTENDER-REGULAR</div>
@@ -145,28 +145,46 @@
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-2">
                         <label for="selectedLetter" class="text-xs font-bold tracking-wide">SELECT LETTER</label>
-                        <div class="text-xs opacity-60">001</div>
                     </div>
-                    <div class="flex space-x-4 items-center">
+                    <div class="flex space-x-4 items-center border border-black/20 dark:border-white/20 p-2">
                         <input type="text" id="selectedLetter" maxlength="1" class="w-16 h-16 text-center text-3xl border border-black/40 dark:border-white/40 bg-transparent" />
-                        <button id="checkButton" class="action-button hover:bg-accent/80">
-                            GENERATE
-                        </button>
+                <div class="flex space-x-4">
+                    <button id="checkButton" class="action-button">
+                        GENERATE
+                    </button>
+                </div>
                     </div>
                 </div>
                 
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-xs font-bold tracking-wide">CHARACTER SETS</label>
-                        <div class="text-xs opacity-60">002</div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="toggleLatinBtn" class="block-button block-button-active" disabled>LATIN</button>
-                        <button id="toggleLatinDiacriticsBtn" class="block-button">DIACRITICS</button>
-                        <button id="toggleVietnameseBtn" class="block-button">VIETNAMESE</button>
-                        <button id="toggleNumbersBtn" class="block-button">NUMBERS</button>
-                        <button id="togglePunctuationBtn" class="block-button">PUNCTUATION</button>
-                        <button id="toggleSymbolsBtn" class="block-button">SYMBOLS</button>
+                    <div class="grid grid-cols-2 gap-2 border border-black/20 dark:border-white/20 p-2">
+                        <button id="toggleLatinBtn" class="block-button block-button-active" disabled>
+                            <span class="flex-grow text-center">LATIN</span>
+                            <span class="inline-block w-2 h-2 bg-accent ml-2"></span>
+                        </button>
+                        <button id="toggleLatinDiacriticsBtn" class="block-button">
+                            <span class="flex-grow text-center">DIACRITICS</span>
+                            <span id="diacriticsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                        </button>
+                        <button id="toggleVietnameseBtn" class="block-button">
+                            <span class="flex-grow text-center">VIETNAMESE</span>
+                            <span id="vietnameseIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                        </button>
+                        <button id="toggleNumbersBtn" class="block-button">
+                            <span class="flex-grow text-center">NUMBERS</span>
+                            <span id="numbersIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                        </button>
+                        <button id="togglePunctuationBtn" class="block-button">
+                            <span class="flex-grow text-center">PUNCTUATION</span>
+                            <span id="punctuationIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                        </button>
+                        <button id="toggleSymbolsBtn" class="block-button">
+                            <span class="flex-grow text-center">SYMBOLS</span>
+                            <span id="symbolsIndicator" class="inline-block w-2 h-2 bg-accent ml-2 opacity-0 transition-opacity duration-150"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -176,7 +194,6 @@
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-2">
                         <label for="fontUpload" class="text-xs font-bold tracking-wide">UPLOAD FONT</label>
-                        <div class="text-xs opacity-60">003</div>
                     </div>
                     <input type="file" id="fontUpload" accept=".ttf,.otf,.woff,.woff2" class="block w-full text-xs border border-black/40 dark:border-white/40 p-2 bg-transparent" />
                 </div>
@@ -185,7 +202,6 @@
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label for="toggleKerning" class="text-xs font-bold tracking-wide">KERNING</label>
-                            <div class="text-xs opacity-60">004</div>
                         </div>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleKerning" class="sr-only" checked />
@@ -199,7 +215,6 @@
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label for="fontSizeSelect" class="text-xs font-bold tracking-wide">SIZE</label>
-                            <div class="text-xs opacity-60">005</div>
                         </div>
                         <select id="fontSizeSelect" class="w-full text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent">
                             <option value="text-xl">SMALL</option>
@@ -212,7 +227,6 @@
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label for="stylisticSetSelect" class="text-xs font-bold tracking-wide">OPENTYPE</label>
-                            <div class="text-xs opacity-60">006</div>
                         </div>
                         <select id="stylisticSetSelect" class="w-full text-xs border border-black/40 dark:border-white/40 p-1 bg-transparent">
                             <option value="none">NO STYLISTIC SET</option>
@@ -248,6 +262,7 @@
                 <div class="text-xl font-bold">RESULTS</div>
                 <div class="flex space-x-4">
                     <button id="copyAllButton" class="block-button">COPY ALL</button>
+                    <div class="h-10 w-px bg-black/20 dark:bg-white/20"></div>
                     <button id="regenerateButton" class="block-button hidden">REGENERATE</button>
                 </div>
             </div>
@@ -268,7 +283,7 @@
                             <span class="text-xs font-bold mr-2">A.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100" data-target="firstPosResults">
+                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="firstPosResults">
                             COPY
                         </button>
                     </div>
@@ -282,7 +297,7 @@
                             <span class="text-xs font-bold mr-2">A.2</span>
                             <span class="text-xs">SECOND POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100" data-target="secondPosResults">
+                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="secondPosResults">
                             COPY
                         </button>
                     </div>
@@ -304,7 +319,7 @@
                             <span class="text-xs font-bold mr-2">B.1</span>
                             <span class="text-xs">FIRST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100" data-target="tripletFirstResults">
+                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletFirstResults">
                             COPY
                         </button>
                     </div>
@@ -318,7 +333,7 @@
                             <span class="text-xs font-bold mr-2">B.2</span>
                             <span class="text-xs">MIDDLE POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100" data-target="tripletMiddleResults">
+                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletMiddleResults">
                             COPY
                         </button>
                     </div>
@@ -332,7 +347,7 @@
                             <span class="text-xs font-bold mr-2">B.3</span>
                             <span class="text-xs">LAST POSITION</span>
                         </div>
-                        <button class="copy-btn text-xs opacity-60 hover:opacity-100" data-target="tripletLastResults">
+                        <button class="copy-btn text-xs opacity-60 hover:opacity-100 transition-all duration-200" data-target="tripletLastResults">
                             COPY
                         </button>
                     </div>
@@ -343,9 +358,14 @@
     </main>
     
     <footer class="border-t border-black/20 dark:border-white/20 py-4 mt-12">
-        <div class="container mx-auto px-4 max-w-5xl flex justify-between items-center">
-            <div class="text-xs opacity-60">©2025 KERNING CHECKER</div>
-            <div class="text-xs opacity-60">V.2.0</div>
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="flex justify-between items-center mb-2">
+                <div class="text-xs opacity-60">©2025 KERNING CHECKER</div>
+                <div class="text-xs opacity-60">V.2.0</div>
+            </div>
+            <div class="text-xs opacity-60 text-center">
+                Designed by <a href="https://www.instagram.com/mikeyokei/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">Mike Yokei</a> • <a href="https://readymag.website/u31066456/5044520/" class="hover:text-accent hover:opacity-100 transition-colors duration-200">Website</a>
+            </div>
         </div>
     </footer>
 
@@ -468,10 +488,22 @@
 
         // Toggle button style helper
         function updateButtonStyle(button, isActive) {
+            // Get the corresponding indicator
+            let indicatorId;
+            if (button.id === 'toggleLatinDiacriticsBtn') indicatorId = 'diacriticsIndicator';
+            else if (button.id === 'toggleVietnameseBtn') indicatorId = 'vietnameseIndicator';
+            else if (button.id === 'toggleNumbersBtn') indicatorId = 'numbersIndicator';
+            else if (button.id === 'togglePunctuationBtn') indicatorId = 'punctuationIndicator';
+            else if (button.id === 'toggleSymbolsBtn') indicatorId = 'symbolsIndicator';
+            
+            const indicator = indicatorId ? document.getElementById(indicatorId) : null;
+            
             if (isActive) {
                 button.classList.add('block-button-active');
+                if (indicator) indicator.classList.remove('opacity-0');
             } else {
                 button.classList.remove('block-button-active');
+                if (indicator) indicator.classList.add('opacity-0');
             }
         }
 
@@ -630,7 +662,7 @@
             });
         });
         
-        // Copy all button functionality
+        // Visual feedback on copy actions
         copyAllButton.addEventListener('click', () => {
             // Collect all text content
             const allSections = [
@@ -666,10 +698,10 @@
             // Visual feedback
             const originalContent = copyAllButton.textContent;
             copyAllButton.textContent = 'ALL COPIED';
-            copyAllButton.classList.add('block-button-active');
+            copyAllButton.classList.add('bg-accent', 'text-black', 'border-accent');
             setTimeout(() => {
                 copyAllButton.textContent = originalContent;
-                copyAllButton.classList.remove('block-button-active');
+                copyAllButton.classList.remove('bg-accent', 'text-black', 'border-accent');
             }, 2000);
         });
 
